@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>FN4004 Design Process 1 – Assessment Mapping Tool</title>
   <style>
-    /* Base styles from the sample HTML */
+    /* Base styles (from the "understanding learning outcomes and grade descriptors" sample) */
     body {
       font-family: Arial, Helvetica, sans-serif;
       background-color: white;
@@ -161,7 +161,7 @@
     .fail {
       background-color: #FF8080;
     }
-    /* Layout for input and results – using a simple vertical layout */
+    /* Layout for input and results */
     .section-title-large {
       font-size: 1.25rem;
       margin-bottom: 12px;
@@ -249,17 +249,17 @@
 <body>
   <div id="root"></div>
 
-  <!-- Load React, ReactDOM, and Babel -->
+  <!-- Load React, ReactDOM, and Babel in the correct order -->
   <script src="https://unpkg.com/react@17/umd/react.development.js"></script>
   <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
   <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
 
-  <!-- Our React component (using JSX) -->
+  <!-- Our React code (transpiled by Babel) -->
   <script type="text/babel">
     const { useState, useEffect, useRef } = React;
 
     const FN4004MappingTool = () => {
-      // Data definitions
+      // Define learning outcomes and associated data
       const learningOutcomes = [
         {
           id: 'outcome1',
@@ -299,6 +299,7 @@
         }
       ];
 
+      // Grade bands data
       const gradeBands = [
         { id: 'first-plus', title: 'First Class (A+)', ranges: ['100%', '98%', '95%', '92%', '88%', '85%'], quality: 'Outstanding' },
         { id: 'first', title: 'First Class (A)', ranges: ['82%', '78%', '75%', '72%', '70%'], quality: 'Very Good' },
@@ -309,7 +310,7 @@
         { id: 'fail', title: 'Fail (F)', ranges: ['32%', '28%', '25%', '22%', '0%'], quality: 'Poor' }
       ];
 
-      // Feedback data for each outcome and grade band (sample text)
+      // Feedback data (sample texts)
       const feedbackData = {
         outcome1: {
           'first-plus': {
@@ -334,8 +335,8 @@
           },
           'third': {
             strength: 'Adequate research with limited depth.',
-            evidence: 'Some sources but mostly descriptive.',
-            improvement: 'Expand and critically analyze your sources.'
+            evidence: 'Mostly descriptive with few insights.',
+            improvement: 'Expand your research and add critical analysis.'
           },
           'marginal-fail': {
             strength: 'Limited research presented.',
@@ -371,7 +372,7 @@
           },
           'third': {
             strength: 'Basic ability to record design ideas.',
-            evidence: 'Documentation is minimal and unstructured.',
+            evidence: 'Minimal and unstructured documentation.',
             improvement: 'Adopt a more systematic approach.'
           },
           'marginal-fail': {
@@ -520,7 +521,7 @@
           'third': {
             strength: 'Basic commitment with limited professional conduct.',
             evidence: 'Poor time management and engagement.',
-            improvement: 'Develop fundamental planning and team work skills.'
+            improvement: 'Develop fundamental planning and teamwork skills.'
           },
           'marginal-fail': {
             strength: 'Very limited commitment and poor self-management.',
@@ -535,6 +536,7 @@
         }
       };
 
+      // Overall improvement advice by grade
       const overallImprovements = {
         fail: [
           'Develop basic understanding of research methods and design processes',
@@ -544,7 +546,7 @@
           'Practice fundamental presentation techniques',
           'Develop basic time management and planning skills'
         ],
-        'marginal-fail': [
+        "marginal-fail": [
           'Strengthen your research with more diverse sources',
           'Show clearer connections between research and design development',
           'Improve organization and documentation of your design process',
@@ -560,7 +562,7 @@
           'Show more consistent professionalism in presentation',
           'Demonstrate more consistent engagement throughout projects'
         ],
-        'lower-second': [
+        "lower-second": [
           'Deepen your research and show stronger critical analysis',
           'Make clearer connections between research and design development',
           'Show more creative exploration in your design process',
@@ -568,7 +570,7 @@
           'Improve consistency in professional presentation standards',
           'Work on more effective planning and time management'
         ],
-        'upper-second': [
+        "upper-second": [
           'Extend research beyond expected sources with deeper critical analysis',
           'Show more innovative connections between research and design',
           'Demonstrate more creative exploration and risk-taking',
@@ -584,7 +586,7 @@
           'Explore innovative presentation methods while maintaining clarity',
           'Develop leadership skills and initiative in collaborative contexts'
         ],
-        'first-plus': [
+        "first-plus": [
           'Continue your outstanding work across all learning outcomes',
           'Consider mentoring others to share your exceptional approach',
           'Explore opportunities to showcase your work professionally',
@@ -593,8 +595,7 @@
         ]
       };
 
-      // Initialize state for performance per outcome
-      // Each outcome will store a selected grade band and a specific mark (default to first item in band)
+      // Initialize performance state for each outcome (default to highest grade band and its lowest mark)
       const initialPerformance = {};
       learningOutcomes.forEach(o => {
         const defaultGrade = gradeBands[0];
@@ -605,24 +606,23 @@
       });
       const [performanceLevels, setPerformanceLevels] = useState(initialPerformance);
 
-      // For modal visibility (only matrix modal here for brevity)
+      // Modal state for Grade Descriptor Matrix
       const [showMatrixModal, setShowMatrixModal] = useState(false);
 
-      // Radar chart canvas ref
+      // Canvas ref for radar chart
       const canvasRef = useRef(null);
 
-      // Draw radar chart when performanceLevels change
+      // Draw radar chart whenever performanceLevels changes
       useEffect(() => {
         if (!canvasRef.current) return;
         const canvas = canvasRef.current;
-        const ctx = canvas.getContext('2d');
+        const ctx = canvas.getContext("2d");
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         const centerX = canvas.width / 2;
         const centerY = canvas.height / 2;
         const radius = Math.min(centerX, centerY) - 30;
         const numAxes = learningOutcomes.length;
         const angleStep = (Math.PI * 2) / numAxes;
-        // Draw concentric circles (one per grade band)
         const gradeCount = gradeBands.length;
         const radiusStep = radius / gradeCount;
         for (let i = 1; i <= gradeCount; i++) {
@@ -632,7 +632,6 @@
           ctx.strokeStyle = i === gradeCount ? "#333" : "#ddd";
           ctx.stroke();
         }
-        // Plot data points for each outcome
         const dataPoints = [];
         for (let i = 0; i < numAxes; i++) {
           const outcome = learningOutcomes[i];
@@ -645,19 +644,15 @@
           const y = centerY + pointRadius * Math.sin(angle);
           dataPoints.push({ x, y });
         }
-        // Draw polygon
         ctx.beginPath();
         ctx.moveTo(dataPoints[0].x, dataPoints[0].y);
-        dataPoints.forEach((pt, idx) => {
-          if (idx > 0) ctx.lineTo(pt.x, pt.y);
-        });
+        dataPoints.forEach((pt, idx) => { if(idx>0) ctx.lineTo(pt.x, pt.y); });
         ctx.closePath();
         ctx.fillStyle = "rgba(59, 130, 246, 0.3)";
         ctx.fill();
         ctx.strokeStyle = "rgba(59, 130, 246, 0.8)";
         ctx.lineWidth = 2;
         ctx.stroke();
-        // Draw data points circles
         dataPoints.forEach(pt => {
           ctx.beginPath();
           ctx.arc(pt.x, pt.y, 6, 0, Math.PI * 2);
@@ -669,7 +664,7 @@
         });
       }, [performanceLevels]);
 
-      // Handlers for grade band and specific percentage changes per outcome
+      // Handlers for changing grade band and specific mark
       const handleGradeBandChange = (outcomeId, gradeId) => {
         const grade = gradeBands.find(g => g.id === gradeId);
         setPerformanceLevels({
@@ -697,16 +692,14 @@
         }
       };
 
-      // Calculate average grade (simple average of percentages)
+      // Calculate the average grade (simple average of percentages)
       const calculateAverageGrade = () => {
-        const nums = Object.values(performanceLevels).map(p => parseFloat(p.percentage.replace('%', '')));
+        const nums = Object.values(performanceLevels).map(p => parseFloat(p.percentage.replace('%','')));
         const avg = nums.reduce((s, v) => s + v, 0) / nums.length;
-        // Find the corresponding grade band (simplified lookup)
         const band = gradeBands.find(b => {
-          const nums = b.ranges.map(r => parseFloat(r.replace('%', '')));
-          return avg >= Math.min(...nums) && avg <= Math.max(...nums);
+          const rNums = b.ranges.map(r => parseFloat(r.replace('%','')));
+          return avg >= Math.min(...rNums) && avg <= Math.max(...rNums);
         }) || gradeBands[gradeBands.length - 1];
-        // For display, round the average to nearest whole number
         return {
           numericValue: Math.round(avg),
           bandId: band.id,
@@ -720,7 +713,6 @@
         };
       };
 
-      // Render the tool
       return (
         <div className="content-wrapper">
           <div className="content">
@@ -732,14 +724,13 @@
               </p>
             </div>
 
-            {/* Performance Level Input Section */}
+            {/* Performance Input Section */}
             <h2 className="section-title-large">Your Performance Level by Outcome</h2>
             {learningOutcomes.map(outcome => (
               <div key={outcome.id} style={{ marginBottom: "24px" }}>
                 <h3>{outcome.title}</h3>
                 <p>{outcome.description}</p>
                 <p className="framework-field">Framework: {outcome.framework}</p>
-                {/* Grade Band Buttons */}
                 <div className="buttons-container">
                   {gradeBands.map(grade => (
                     <button
@@ -751,7 +742,6 @@
                     </button>
                   ))}
                 </div>
-                {/* Specific Mark Buttons */}
                 <div className="buttons-container">
                   {gradeBands
                     .find(g => g.id === performanceLevels[outcome.id].bandId)
@@ -858,7 +848,7 @@
 
           {/* Grade Descriptor Matrix Modal */}
           {showMatrixModal && (
-            <div className="modal" onClick={(e) => { if(e.target.className==='modal') setShowMatrixModal(false); }}>
+            <div className="modal" onClick={(e) => { if (e.target.className === "modal") setShowMatrixModal(false); }}>
               <div className="modal-content">
                 <span className="close-modal" onClick={() => setShowMatrixModal(false)}>&times;</span>
                 <h2>Complete FN4004 Grade Descriptor Matrix</h2>
