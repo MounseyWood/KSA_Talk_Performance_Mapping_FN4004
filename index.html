@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -160,11 +161,20 @@
             color: black;
         }
         
-        .outcome-content {
+        /* Added border to input and detailed feedback sections */
+        .input-section, .detailed-feedback-section {
             background-color: #f9fafb;
             padding: 24px;
             border-radius: 2px;
-            border: 1px solid #e5e7eb; /* Added border */
+            border: 1px solid #e5e7eb; 
+            margin-bottom: 24px;
+        }
+
+        .outcome-content { /* This already had the border */
+            background-color: #f9fafb;
+            padding: 24px;
+            border-radius: 2px;
+            border: 1px solid #e5e7eb; 
             margin-bottom: 24px;
         }
         
@@ -195,33 +205,13 @@
         }
         
         /* Updated Grade colors */
-        .first-plus {
-            background-color: #80FF80;
-        }
-        
-        .first {
-            background-color: #BFFF80;
-        }
-        
-        .upper-second {
-            background-color: #FFFF80;
-        }
-        
-        .lower-second {
-            background-color: #FFE880;
-        }
-        
-        .third {
-            background-color: #FFCC80;
-        }
-        
-        .marginal-fail {
-            background-color: #FF9980;
-        }
-        
-        .fail {
-            background-color: #FF8080;
-        }
+        .first-plus { background-color: #80FF80; }
+        .first { background-color: #BFFF80; }
+        .upper-second { background-color: #FFFF80; }
+        .lower-second { background-color: #FFE880; }
+        .third { background-color: #FFCC80; }
+        .marginal-fail { background-color: #FF9980; }
+        .fail { background-color: #FF8080; }
         
         .section-title {
             font-weight: 700;
@@ -239,6 +229,7 @@
         ul.advice-list {
             list-style-type: disc;
             padding-left: 24px;
+             margin: 0; /* Remove default ul margin */
         }
         
         ul.advice-list li {
@@ -260,12 +251,13 @@
             margin-bottom: 16px;
         }
         
+        /* Action buttons layout adjustments */
         .action-buttons {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Responsive columns */
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); /* Adjusted minmax for better fit */
             gap: 15px; /* Increased gap */
             max-width: 1000px; /* Adjusted max width */
-            margin: 30px auto;
+            margin: 40px auto 30px auto; /* Increased top margin */
             padding: 0 15px; /* Add padding for smaller screens */
             box-sizing: border-box;
         }
@@ -293,10 +285,17 @@
                  grid-template-columns: 1fr; /* Single column */
                  max-width: 90%; /* Adjust width */
                  padding: 0;
+                 margin-top: 30px; /* Adjust margin */
              }
 
              .full-width-button {
                  grid-column: span 1; /* Reset span for single column */
+             }
+             .grid-container { /* Stack columns on smaller screens */
+                 grid-template-columns: 1fr;
+             }
+             .detailed-feedback-grid { /* Stack feedback cards */
+                 grid-template-columns: 1fr;
              }
         }
         
@@ -311,10 +310,19 @@
         }
         
         /* Performance Chart */
-        #performance-chart {
-            margin: 0 auto;
-            max-width: 400px;
+        #performance-chart-container { /* Added container for responsiveness */
+             position: relative;
+             margin: 0 auto;
+             max-width: 400px;
+             width: 100%; /* Take full width of container */
+             aspect-ratio: 1 / 1; /* Maintain square aspect ratio */
         }
+        #performance-chart {
+            display: block; /* Ensure canvas is block level */
+            width: 100% !important; /* Force width */
+            height: 100% !important; /* Force height */
+        }
+
         
         /* Modal styles */
         .modal {
@@ -369,6 +377,7 @@
             font-weight: bold;
             width: 20%;
             text-align: left !important;
+             min-width: 150px; /* Prevent excessive shrinking */
         }
         
         .matrix-table tr:first-child th {
@@ -376,6 +385,7 @@
             padding: 8px;
             color: black;
             font-weight: bold;
+            min-width: 100px; /* Prevent excessive shrinking */
         }
         
         /* Success message */
@@ -397,41 +407,38 @@
             width: 100%;
             border-collapse: collapse;
             margin: 15px 0;
+            font-size: 0.85rem; /* Smaller font for dense table */
         }
         
         .compare-table th, .compare-table td {
-            padding: 8px;
+            padding: 6px; /* Reduced padding */
             border: 1px solid #ddd;
             text-align: center;
         }
         
         .compare-table th {
             background-color: #f1f1f1;
+             white-space: nowrap; /* Prevent header text wrapping */
         }
-        
-        .improvement-positive {
-            color: #52c41a;
-            font-weight: bold;
-        }
-        
-        .improvement-negative {
-            color: #f5222d;
-            font-weight: bold;
-        }
-        
-        .improvement-neutral {
-            color: #666;
+        .compare-table td:first-child { /* Date column */
+             white-space: nowrap;
         }
 
-        .grid-container {
+        
+        .improvement-positive { color: #52c41a; font-weight: bold; }
+        .improvement-negative { color: #f5222d; font-weight: bold; }
+        .improvement-neutral { color: #666; }
+
+        /* Grid Layout Styles */
+         .grid-container {
              display: grid;
              grid-template-columns: 1fr; /* Default: single column */
              gap: 24px;
          }
 
-         @media (min-width: 1024px) { /* Apply grid layout on larger screens */
+         @media (min-width: 1024px) { /* Apply grid layout on larger screens (lg) */
              .grid-container {
-                 grid-template-columns: 1fr 1fr; /* Two columns */
+                 grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); /* Two equal columns */
              }
          }
 
@@ -441,9 +448,9 @@
              gap: 16px; /* Smaller gap for feedback cards */
          }
 
-         @media (min-width: 768px) { /* Apply grid layout on medium screens and up */
+         @media (min-width: 768px) { /* Apply grid layout on medium screens and up (md) */
              .detailed-feedback-grid {
-                 grid-template-columns: 1fr 1fr; /* Two columns */
+                 grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Responsive columns for feedback */
              }
          }
 
@@ -455,8 +462,8 @@
         <div class="content">
             <div class="header">
                 <img src="Talk_Performance_Mapping_FN4004.png" alt="FN4004 Performance Mapping Tool" class="logo">
-                 <!-- Removed background from this paragraph -->
-                <p style="font-size: 14px; margin: 25px auto 0; max-width: 800px; text-align: center;">
+                 <!-- Removed background style from this paragraph -->
+                <p style="font-size: clamp(13px, 1.5vw, 14px); margin: 25px auto 0; max-width: 800px; text-align: center; padding: 0 15px;">
                     This interactive tool helps you understand how your performance varies across different learning outcomes.
                     Select your current level for each learning outcome to see targeted feedback and visualize your overall profile.
                 </p>
@@ -465,8 +472,7 @@
             <div id="feedback-app">
                 <div class="grid-container"> <!-- Using grid container -->
                     <!-- Left column - Inputs -->
-                     <!-- Added border to this div -->
-                    <div class="input-section" style="background-color: #f9fafb; padding: 24px; border-radius: 2px; border: 1px solid #e5e7eb;">
+                    <div class="input-section"> <!-- Added border via class rule -->
                         <h2 class="text-xl font-bold mb-4" style="font-size: 1.25rem; font-weight: bold; margin-bottom: 1rem;">Your Performance Level by Outcome</h2>
                         
                         <div id="outcomes-container">
@@ -479,7 +485,10 @@
                         <!-- Performance Chart -->
                         <div class="bg-white p-4 rounded-md shadow-md mb-6" style="background-color: white; padding: 16px; border-radius: 2px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 24px;">
                             <h2 class="text-xl font-bold mb-4 text-center" style="font-size: 1.25rem; font-weight: bold; margin-bottom: 1rem; text-align: center;">Your Performance Profile</h2>
-                            <canvas id="performance-chart" width="400" height="400" style="max-width: 100%; height: auto;"></canvas> <!-- Added responsive styles -->
+                            <!-- Chart container for better responsiveness -->
+                            <div id="performance-chart-container">
+                                 <canvas id="performance-chart"></canvas> 
+                            </div>
                         </div>
                         
                         <!-- Indicative average grade -->
@@ -498,7 +507,7 @@
                         <!-- Key areas for improvement -->
                         <div class="bg-white p-4 rounded-md shadow-md" style="background-color: white; padding: 16px; border-radius: 2px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
                             <h2 class="text-xl font-bold mb-4" style="font-size: 1.25rem; font-weight: bold; margin-bottom: 1rem;">Key Areas for Improvement</h2>
-                            <ul id="key-improvements" class="list-disc pl-5 space-y-2" style="list-style-type: disc; padding-left: 20px; margin: 0;"> <!-- Removed default ul margin -->
+                            <ul id="key-improvements" class="advice-list"> <!-- Applied advice-list class -->
                                 <!-- Improvement items will be generated here -->
                             </ul>
                         </div>
@@ -506,8 +515,7 @@
                 </div>
                 
                 <!-- Bottom section - Detailed feedback -->
-                 <!-- Added border to this div -->
-                <div class="mt-8 detailed-feedback-section" style="margin-top: 32px; background-color: #f9fafb; padding: 24px; border-radius: 2px; border: 1px solid #e5e7eb;">
+                <div class="mt-8 detailed-feedback-section"> <!-- Added border via class rule -->
                     <h2 class="text-xl font-bold mb-4" style="font-size: 1.25rem; font-weight: bold; margin-bottom: 1rem;">Your Detailed Assessment Profile</h2>
                     
                     <div id="detailed-feedback" class="detailed-feedback-grid"> <!-- Using grid for feedback cards -->
@@ -516,9 +524,10 @@
                 </div>
                 
                 <!-- Overall Advice section -->
-                <div class="mt-8 bg-white p-6 rounded-md shadow-md" style="margin-top: 32px; background-color: white; padding: 24px; border-radius: 2px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                 <!-- Added border -->
+                <div class="mt-8 advice-section"> 
                     <h2 class="text-xl font-bold mb-4" style="font-size: 1.25rem; font-weight: bold; margin-bottom: 1rem;">How to improve your overall grade:</h2>
-                    <ul id="overall-advice" class="list-disc pl-5 space-y-2" style="list-style-type: disc; padding-left: 20px; margin: 0;"> <!-- Removed default ul margin -->
+                    <ul id="overall-advice" class="advice-list"> <!-- Applied advice-list class -->
                         <!-- Overall advice items will be generated here -->
                     </ul>
                 </div>
@@ -699,7 +708,7 @@
                                 <h3>Improvement Analysis</h3>
                                 <div style="background-color: white; padding: 16px; border-radius: 2px; border: 1px solid #e5e7eb;">
                                     <h4 id="previous-date" style="font-weight: 600; margin-bottom: 10px;">Compared to previous assessment:</h4>
-                                    <ul id="improvement-list" style="list-style-type: disc; padding-left: 20px; margin: 0;"> <!-- Removed default ul margin -->
+                                    <ul id="improvement-list" class="advice-list"> <!-- Applied advice-list class -->
                                         <!-- Improvement list will be generated here -->
                                     </ul>
                                 </div>
@@ -721,9 +730,12 @@
         </div>
     </div>
     
+     <!-- Include Chart.js library -->
+     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Learning outcomes data
+            // Learning outcomes data (remains the same)
             const learningOutcomes = [
                  // LO1-LO5 remain the same as provided
                 {
@@ -986,7 +998,7 @@
                 }
             ];
             
-            // Grade bands data with step marking (percentages ordered from high to low)
+            // Grade bands data (remains the same)
             const gradeBands = [
                 { id: 'first-plus', title: 'First Class (A+)', ranges: ['100%', '98%', '95%', '92%', '88%', '85%'], quality: 'Outstanding', color: '#80FF80', letterGrade: 'A+' },
                 { id: 'first', title: 'First Class (A)', ranges: ['82%', '78%', '75%', '72%', '70%'], quality: 'Very Good', color: '#BFFF80', letterGrade: 'A' },
@@ -997,66 +1009,18 @@
                 { id: 'fail', title: 'Fail (F)', ranges: ['32%', '28%', '25%', '22%', '0%'], quality: 'Poor', color: '#FF8080', letterGrade: 'F' }
             ];
             
-            // Overall improvement advice by grade
+            // Overall improvement advice (remains the same)
             const overallImprovements = {
-                'fail': [
-                    'Develop basic understanding of research methods and design processes',
-                    'Begin to analyze materials rather than just describing them',
-                    'Improve documentation of your design development process',
-                    'Show evidence of basic material investigation',
-                    'Practice fundamental presentation techniques',
-                    'Develop basic time management and planning skills'
-                ],
-                'marginal-fail': [
-                    'Strengthen your research with more diverse sources',
-                    'Show clearer connections between research and design development',
-                    'Improve organization and documentation of your design process',
-                    'Conduct more thorough material investigations',
-                    'Practice basic presentation techniques for more professional outcomes',
-                    'Improve your self-management and planning'
-                ],
-                'third': [
-                    'Expand your research beyond obvious sources',
-                    'Develop better analytical skills rather than just describing',
-                    'Improve organization of your design development process',
-                    'Conduct more detailed material investigations with clearer evaluation',
-                    'Show more consistent professionalism in presentation',
-                    'Demonstrate more consistent engagement throughout projects'
-                ],
-                'lower-second': [
-                    'Deepen your research and show stronger critical analysis',
-                    'Make clearer connections between research and design development',
-                    'Show more creative exploration in your design process',
-                    'Enhance material investigations with more thoughtful evaluation',
-                    'Improve consistency in professional presentation standards',
-                    'Work on more effective planning and time management'
-                ],
-                'upper-second': [
-                    'Extend research beyond expected sources with deeper critical analysis',
-                    'Show more innovative connections between research and design',
-                    'Demonstrate more creative exploration and risk-taking',
-                    'Develop more sophisticated evaluation of materials and applications',
-                    'Refine presentation techniques for more professional outcomes',
-                    'Improve self-reflection and engagement with feedback'
-                ],
-                'first': [
-                    'Push research to discover unexpected connections and insights',
-                    'Take more creative risks that result in innovative outcomes',
-                    'Demonstrate exceptional critical thinking throughout',
-                    'Perfect technical execution in all aspects',
-                    'Explore innovative presentation methods while maintaining clarity',
-                    'Develop leadership skills and initiative in collaborative contexts'
-                ],
-                'first-plus': [
-                    'Continue your outstanding work across all learning outcomes',
-                    'Consider mentoring others to share your exceptional approach',
-                    'Explore opportunities to showcase your work professionally',
-                    'Maintain your excellent standard while continuing to innovate',
-                    'Develop your professional network and industry connections'
-                ]
+                'fail': [ 'Develop basic understanding of research methods and design processes', 'Begin to analyze materials rather than just describing them', 'Improve documentation of your design development process', 'Show evidence of basic material investigation', 'Practice fundamental presentation techniques', 'Develop basic time management and planning skills' ],
+                'marginal-fail': [ 'Strengthen your research with more diverse sources', 'Show clearer connections between research and design development', 'Improve organization and documentation of your design process', 'Conduct more thorough material investigations', 'Practice basic presentation techniques for more professional outcomes', 'Improve your self-management and planning' ],
+                'third': [ 'Expand your research beyond obvious sources', 'Develop better analytical skills rather than just describing', 'Improve organization of your design development process', 'Conduct more detailed material investigations with clearer evaluation', 'Show more consistent professionalism in presentation', 'Demonstrate more consistent engagement throughout projects' ],
+                'lower-second': [ 'Deepen your research and show stronger critical analysis', 'Make clearer connections between research and design development', 'Show more creative exploration in your design process', 'Enhance material investigations with more thoughtful evaluation', 'Improve consistency in professional presentation standards', 'Work on more effective planning and time management' ],
+                'upper-second': [ 'Extend research beyond expected sources with deeper critical analysis', 'Show more innovative connections between research and design', 'Demonstrate more creative exploration and risk-taking', 'Develop more sophisticated evaluation of materials and applications', 'Refine presentation techniques for more professional outcomes', 'Improve self-reflection and engagement with feedback' ],
+                'first': [ 'Push research to discover unexpected connections and insights', 'Take more creative risks that result in innovative outcomes', 'Demonstrate exceptional critical thinking throughout', 'Perfect technical execution in all aspects', 'Explore innovative presentation methods while maintaining clarity', 'Develop leadership skills and initiative in collaborative contexts' ],
+                'first-plus': [ 'Continue your outstanding work across all learning outcomes', 'Consider mentoring others to share your exceptional approach', 'Explore opportunities to showcase your work professionally', 'Maintain your excellent standard while continuing to innovate', 'Develop your professional network and industry connections' ]
             };
             
-            // Default performance levels
+            // Default performance levels (remains the same)
             let performanceLevels = {
                 outcome1: { bandId: 'first', percentage: '75%' },
                 outcome2: { bandId: 'upper-second', percentage: '65%' },
@@ -1066,7 +1030,7 @@
                 outcome6: { bandId: 'upper-second', percentage: '68%' }
             };
             
-            // Get DOM elements
+            // Get DOM elements (remains the same)
             const outcomeContainer = document.getElementById('outcomes-container');
             const performanceChartElement = document.getElementById('performance-chart');
             const gradeDisplay = document.getElementById('average-grade-display');
@@ -1077,7 +1041,7 @@
             const detailedFeedback = document.getElementById('detailed-feedback');
             const overallAdvice = document.getElementById('overall-advice');
             
-            // Modal elements
+            // Modal elements (remains the same)
             const matrixModal = document.getElementById('matrix-modal');
             const compareModal = document.getElementById('compare-modal');
             const closeMatrixBtn = document.getElementById('close-matrix');
@@ -1085,16 +1049,16 @@
             const closeCompareBtn = document.getElementById('close-compare');
             const closeCompareBtn2 = document.getElementById('close-compare-btn');
             
-            // Action buttons
+            // Action buttons (remains the same)
             const saveProfileBtn = document.getElementById('save-profile-btn');
             const compareProfilesBtn = document.getElementById('compare-profiles-btn');
             const printSummaryBtn = document.getElementById('print-summary-btn');
             const matrixButton = document.getElementById('matrix-button');
             
-            // Success message
+            // Success message (remains the same)
             const successMessage = document.getElementById('success-message');
 
-            // Chart.js instance
+            // Chart.js instance variable
             let performanceChart = null; 
             
             // Initialize UI
@@ -1104,62 +1068,37 @@
             // Check for saved profiles
             checkSavedProfiles();
             
-            // Set up modal event listeners
-            matrixButton.addEventListener('click', () => {
-                matrixModal.style.display = 'block';
-            });
-            
-            closeMatrixBtn.addEventListener('click', () => {
-                matrixModal.style.display = 'none';
-            });
-            
-            closeMatrixBtn2.addEventListener('click', () => {
-                matrixModal.style.display = 'none';
-            });
-            
-            compareProfilesBtn.addEventListener('click', () => {
-                updateCompareModal();
-                compareModal.style.display = 'block';
-            });
-            
-            closeCompareBtn.addEventListener('click', () => {
-                compareModal.style.display = 'none';
-            });
-            
-            closeCompareBtn2.addEventListener('click', () => {
-                compareModal.style.display = 'none';
-            });
-            
+            // Set up modal event listeners (remains the same)
+            matrixButton.addEventListener('click', () => { matrixModal.style.display = 'block'; });
+            closeMatrixBtn.addEventListener('click', () => { matrixModal.style.display = 'none'; });
+            closeMatrixBtn2.addEventListener('click', () => { matrixModal.style.display = 'none'; });
+            compareProfilesBtn.addEventListener('click', () => { updateCompareModal(); compareModal.style.display = 'block'; });
+            closeCompareBtn.addEventListener('click', () => { compareModal.style.display = 'none'; });
+            closeCompareBtn2.addEventListener('click', () => { compareModal.style.display = 'none'; });
             window.addEventListener('click', (event) => {
-                if (event.target === matrixModal) {
-                    matrixModal.style.display = 'none';
-                }
-                if (event.target === compareModal) {
-                    compareModal.style.display = 'none';
-                }
+                if (event.target === matrixModal) { matrixModal.style.display = 'none'; }
+                if (event.target === compareModal) { compareModal.style.display = 'none'; }
             });
             
-            // Save profile button
+            // Save profile button (remains the same)
             saveProfileBtn.addEventListener('click', saveProfile);
             
-            // Print summary button
+            // Print summary button (remains the same)
             printSummaryBtn.addEventListener('click', printSummary);
             
             // Initialize the UI components
             function initializeUI() {
-                // Create outcome inputs
                 outcomeContainer.innerHTML = '';
-                
                 learningOutcomes.forEach(outcome => {
                     const outcomeElement = document.createElement('div');
-                    outcomeElement.className = 'mb-6'; // Use class for margin
-                    outcomeElement.style.marginBottom = '24px'; // Ensure bottom margin
+                    outcomeElement.className = 'mb-6'; 
+                    outcomeElement.style.marginBottom = '24px'; 
                     
+                    // *** REQUIREMENT 5: Update Framework Label ***
                     const html = `
                         <h3 class="font-bold text-gray-800" style="font-weight: bold; color: #333;">${outcome.title}</h3>
                         <p class="text-sm text-gray-600 mb-2" style="font-size: 0.875rem; color: #555; margin-bottom: 8px;">${outcome.description}</p>
-                        <!-- Updated Framework Label -->
-                        <p class="framework-field">School of Design Framework Mapping: ${outcome.framework}</p>
+                        <p class="framework-field">School of Design Framework Mapping: ${outcome.framework}</p> 
                         
                         <div class="mb-3">
                             <label class="text-sm font-semibold block mb-1" style="font-size: 0.875rem; font-weight: 600; display: block; margin-bottom: 4px;">Select Grade Band:</label>
@@ -1170,8 +1109,9 @@
                                         data-grade-id="${grade.id}" 
                                         data-outcome-id="${outcome.id}" 
                                         style="background-color: ${grade.color};"
+                                        title="${grade.title} (${grade.ranges.join(', ')})" 
                                     >
-                                        ${grade.title.split('(')[0]} <!-- Shortened title -->
+                                        ${grade.title.split('(')[0]} 
                                     </button>
                                 `).join('')}
                             </div>
@@ -1197,36 +1137,21 @@
                     outcomeContainer.appendChild(outcomeElement);
                 });
                 
-                // Add event listeners to grade buttons
-                document.querySelectorAll('.grade-btn').forEach(button => {
-                    button.addEventListener('click', handleGradeBandChange);
-                });
-                
-                // Add event listeners to percentage buttons
-                document.querySelectorAll('.percentage-btn').forEach(button => {
-                    button.addEventListener('click', handlePercentageChange);
-                });
+                document.querySelectorAll('.grade-btn').forEach(button => button.addEventListener('click', handleGradeBandChange));
+                document.querySelectorAll('.percentage-btn').forEach(button => button.addEventListener('click', handlePercentageChange));
             }
             
-            // Handle grade band change
+            // Handle grade band change (remains the same)
             function handleGradeBandChange(event) {
                 const outcomeId = event.target.dataset.outcomeId;
                 const gradeId = event.target.dataset.gradeId;
                 
-                // Update active state
-                document.querySelectorAll(`#grade-buttons-${outcomeId} .grade-btn`).forEach(btn => {
-                    btn.classList.remove('active');
-                });
+                document.querySelectorAll(`#grade-buttons-${outcomeId} .grade-btn`).forEach(btn => btn.classList.remove('active'));
                 event.target.classList.add('active');
                 
-                // Update performance level
                 const defaultPercentage = gradeBands.find(g => g.id === gradeId).ranges[0];
-                performanceLevels[outcomeId] = {
-                    bandId: gradeId,
-                    percentage: defaultPercentage
-                };
+                performanceLevels[outcomeId] = { bandId: gradeId, percentage: defaultPercentage };
                 
-                // Update percentage buttons
                 const percentageContainer = document.getElementById(`percentage-buttons-${outcomeId}`);
                 percentageContainer.innerHTML = gradeBands.find(g => g.id === gradeId).ranges.map(percentage => `
                     <button 
@@ -1238,27 +1163,18 @@
                     </button>
                 `).join('');
                 
-                // Add event listeners to percentage buttons
-                percentageContainer.querySelectorAll('.percentage-btn').forEach(button => {
-                    button.addEventListener('click', handlePercentageChange);
-                });
-                
-                // Update content
+                percentageContainer.querySelectorAll('.percentage-btn').forEach(button => button.addEventListener('click', handlePercentageChange));
                 updateAllContent();
             }
             
-            // Handle percentage change
+            // Handle percentage change (remains the same)
             function handlePercentageChange(event) {
                 const outcomeId = event.target.dataset.outcomeId;
                 const percentage = event.target.dataset.percentage;
                 
-                // Update active state
-                document.querySelectorAll(`#percentage-buttons-${outcomeId} .percentage-btn`).forEach(btn => {
-                    btn.classList.remove('active');
-                });
+                document.querySelectorAll(`#percentage-buttons-${outcomeId} .percentage-btn`).forEach(btn => btn.classList.remove('active'));
                 event.target.classList.add('active');
                 
-                // Find grade band for this percentage
                 let gradeBandId = null;
                 for (const band of gradeBands) {
                     if (band.ranges.includes(percentage)) {
@@ -1268,26 +1184,15 @@
                 }
                 
                 if (gradeBandId) {
-                    // Update performance level
-                    performanceLevels[outcomeId] = {
-                        bandId: gradeBandId,
-                        percentage: percentage
-                    };
-                    
-                    // Update grade band buttons
+                    performanceLevels[outcomeId] = { bandId: gradeBandId, percentage: percentage };
                     document.querySelectorAll(`#grade-buttons-${outcomeId} .grade-btn`).forEach(btn => {
-                        btn.classList.remove('active');
-                        if (btn.dataset.gradeId === gradeBandId) {
-                            btn.classList.add('active');
-                        }
+                        btn.classList.toggle('active', btn.dataset.gradeId === gradeBandId);
                     });
-                    
-                    // Update content
                     updateAllContent();
                 }
             }
             
-            // Update all content based on performance levels
+            // Update all content (remains the same)
             function updateAllContent() {
                 updatePerformanceChart();
                 updateAverageGrade();
@@ -1296,29 +1201,29 @@
                 updateOverallAdvice();
             }
             
-           // Update performance chart (using placeholder for Chart.js integration)
+            // Update performance chart (remains the same)
            function updatePerformanceChart() {
+               if (!Chart) { // Check if Chart.js is loaded
+                    console.error("Chart.js library not loaded.");
+                    performanceChartElement.parentElement.innerHTML = '<p style="text-align: center; color: red;">Error: Chart library not loaded.</p>';
+                    return;
+                }
                const ctx = performanceChartElement.getContext('2d');
 
-               // Destroy previous chart instance if it exists
-               if (performanceChart) {
-                   performanceChart.destroy();
-               }
+               if (performanceChart) { performanceChart.destroy(); }
 
-               // Map performance levels to numerical values (0-6, where 6 is highest)
                const dataValues = learningOutcomes.map(outcome => {
                    const gradeId = performanceLevels[outcome.id].bandId;
                    const gradeIndex = gradeBands.findIndex(g => g.id === gradeId);
-                   return gradeBands.length - 1 - gradeIndex; // Reverse index
+                   return gradeBands.length - 1 - gradeIndex; 
                });
 
-               const labels = learningOutcomes.map(outcome => outcome.title.split(':')[0]); // Short labels
+               const labels = learningOutcomes.map(outcome => outcome.title.split(':')[0]); 
                const backgroundColors = learningOutcomes.map(outcome => {
                    const gradeId = performanceLevels[outcome.id].bandId;
                    return gradeBands.find(g => g.id === gradeId)?.color || '#ccc';
                });
 
-               // Create new Chart.js instance
                performanceChart = new Chart(ctx, {
                    type: 'radar',
                    data: {
@@ -1327,51 +1232,31 @@
                            label: 'Performance',
                            data: dataValues,
                            fill: true,
-                           backgroundColor: 'rgba(59, 130, 246, 0.3)', // Semi-transparent blue fill
-                           borderColor: 'rgba(59, 130, 246, 0.8)', // Solid blue line
-                           pointBackgroundColor: backgroundColors, // Use grade colors for points
+                           backgroundColor: 'rgba(59, 130, 246, 0.3)', 
+                           borderColor: 'rgba(59, 130, 246, 0.8)', 
+                           pointBackgroundColor: backgroundColors, 
                            pointBorderColor: '#333',
                            pointHoverBackgroundColor: backgroundColors,
                            pointHoverBorderColor: '#000',
-                           pointRadius: 6, // Make points visible
+                           pointRadius: 6, 
                            pointHoverRadius: 8
                        }]
                    },
                    options: {
                        responsive: true,
-                       maintainAspectRatio: false, // Allow chart to resize better
-                       elements: {
-                           line: {
-                               borderWidth: 2
-                           }
-                       },
+                       maintainAspectRatio: true, // Keep aspect ratio from container
                        scales: {
                            r: {
-                               angleLines: {
-                                   display: true,
-                                   color: '#ddd' // Lighter grid lines
-                               },
-                               grid: {
-                                    color: '#ddd' // Lighter grid lines
-                                },
-                                pointLabels: {
-                                    font: {
-                                        size: 11 // Adjust font size if needed
-                                    },
-                                     color: '#333'
-                                },
-                                suggestedMin: 0,
-                                suggestedMax: gradeBands.length -1, // Max value is number of grades - 1
-                                ticks: {
-                                    stepSize: 1,
-                                    display: false // Hide numerical ticks on spokes
-                                }
+                               angleLines: { display: true, color: '#ddd' },
+                               grid: { color: '#ddd' },
+                               pointLabels: { font: { size: 11 }, color: '#333' },
+                               suggestedMin: 0,
+                               suggestedMax: gradeBands.length -1, 
+                               ticks: { stepSize: 1, display: false }
                            }
                        },
                        plugins: {
-                            legend: {
-                                display: false // Hide dataset label legend
-                            },
+                            legend: { display: false },
                            tooltip: {
                                 callbacks: {
                                     label: function(context) {
@@ -1390,188 +1275,6 @@
             
             // Calculate and update average grade
             function updateAverageGrade() {
-                // Convert percentage strings to numbers
-                const percentages = Object.values(performanceLevels).map(level => 
-                    parseFloat(level.percentage.replace('%', ''))
-                );
-                
-                // Calculate simple average
-                const average = percentages.reduce((sum, val) => sum + val, 0) / percentages.length;
-                
-                // Determine the closest step mark
-                let roundedAverage;
-                const lowerBound = Math.floor(average);
-                const upperBound = Math.ceil(average);
-                
-                // Find all possible step marks
-                const allSteps = gradeBands.flatMap(band => band.ranges.map(r => parseFloat(r.replace('%',''))));
-                allSteps.sort((a, b) => a - b);
-
-                // Find closest step mark
-                roundedAverage = allSteps.reduce((prev, curr) => {
-                    return (Math.abs(curr - average) < Math.abs(prev - average) ? curr : prev);
-                });
-
-                // Handle edge case where average might be exactly between two steps
-                // (rounding logic above handles this by choosing the one with smaller absolute difference)
-                // Ensure roundedAverage is a valid step mark
-                 if (!allSteps.includes(roundedAverage)) {
-                     // Fallback if calculation fails - choose nearest available step
-                      roundedAverage = allSteps.reduce((prev, curr) => 
-                           Math.abs(curr - average) < Math.abs(prev - average) ? curr : prev
-                      );
-                 }
-
-                
-                // Find grade band for the rounded average
-                let gradeBand = null;
-                for (const band of gradeBands) {
-                    const rangeNums = band.ranges.map(r => parseFloat(r.replace('%', '')));
-                    const minRange = Math.min(...rangeNums);
-                    const maxRange = Math.max(...rangeNums);
-                    
-                     // Use a small epsilon for floating point comparisons
-                     const epsilon = 0.01; 
-                    if (roundedAverage >= minRange - epsilon && roundedAverage <= maxRange + epsilon) {
-                        gradeBand = band;
-                        break;
-                    }
-                }
-                
-                // Fallback if no band found (shouldn't happen with correct steps)
-                if (!gradeBand) {
-                     gradeBand = gradeBands[gradeBands.length - 1]; // Default to Fail
-                     console.warn("Could not determine grade band for average:", roundedAverage);
-                }
-
-                
-                if (gradeBand) {
-                    // Update grade display
-                    gradeDisplay.className = ''; // Clear existing classes first
-                    gradeDisplay.classList.add('flex', 'items-center', 'justify-center', 'gap-4', 'p-4', 'rounded-md', gradeBand.id); // Re-add base classes + new grade ID
-                    gradeDisplay.style.backgroundColor = gradeBand.color;
-                    gradeDisplay.style.display = 'flex'; // Ensure display flex is set
-                    gradeDisplay.style.alignItems = 'center';
-                    gradeDisplay.style.justifyContent = 'center';
-                    gradeDisplay.style.gap = '16px';
-                    gradeDisplay.style.padding = '16px';
-                    gradeDisplay.style.borderRadius = '2px';
-
-
-                    
-                    letterGrade.textContent = gradeBand.letterGrade;
-                    gradeTitle.textContent = gradeBand.title;
-                    numericGrade.textContent = `${roundedAverage}%`;
-                }
-            }
-            
-            // Update key improvements
-            function updateKeyImprovements() {
-                keyImprovements.innerHTML = '';
-                
-                learningOutcomes.forEach(outcome => {
-                    const feedback = outcome.feedback[performanceLevels[outcome.id].bandId];
-                    
-                    const li = document.createElement('li');
-                     // Use Summary from feedback for key improvements
-                    li.innerHTML = `<span style="font-weight: 600;">${outcome.title.split(':')[0]}:</span> ${feedback.improvement}`;
-                    keyImprovements.appendChild(li);
-                });
-            }
-            
-            // Update detailed feedback
-            function updateDetailedFeedback() {
-                detailedFeedback.innerHTML = '';
-                
-                learningOutcomes.forEach(outcome => {
-                    const gradeInfo = performanceLevels[outcome.id];
-                    const grade = gradeBands.find(g => g.id === gradeInfo.bandId);
-                    const feedback = outcome.feedback[gradeInfo.bandId];
-                    
-                    const card = document.createElement('div');
-                    // Use feedback-card class which already has styles
-                    card.className = 'feedback-card'; 
-                   
-                    // Updated labels
-                    card.innerHTML = `
-                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
-                            <h3 style="font-weight: bold; margin: 0;">${outcome.title}</h3> <!-- Removed default h3 margins -->
-                            <div style="display: flex; flex-direction: column; align-items: flex-end;">
-                                <span 
-                                    style="padding: 4px 8px; border-radius: 2px; font-size: 0.875rem; font-weight: bold; margin-bottom: 4px; background-color: ${grade.color}; color: #333;"
-                                >
-                                    ${grade.title}
-                                </span>
-                                <span style="font-size: 0.875rem; font-weight: bold;">${gradeInfo.percentage}</span>
-                            </div>
-                        </div>
-                        
-                        <div style="font-size: 0.875rem;">
-                            <div style="margin-bottom: 8px;">
-                                <strong class="section-title">Strengths Evidenced in Your Work:</strong><br>${feedback.strength}
-                            </div>
-                            <div style="margin-bottom: 8px;">
-                                <strong class="section-title">Areas for Reflection and Practice:</strong><br>${feedback.evidence}
-                            </div>
-                            <div>
-                                <strong class="section-title">Summary:</strong><br>${feedback.improvement}
-                            </div>
-                        </div>
-                    `;
-                    
-                    detailedFeedback.appendChild(card);
-                });
-            }
-            
-            // Update overall advice
-            function updateOverallAdvice() {
-                // Calculate average grade to determine advice level
-                const percentages = Object.values(performanceLevels).map(level => 
-                    parseFloat(level.percentage.replace('%', ''))
-                );
-                
-                const average = percentages.reduce((sum, val) => sum + val, 0) / percentages.length;
-                
-                // Find grade band ID based on simple average (as advice is general)
-                 let gradeBandId = 'fail'; // Default
-                 for (let i = 0; i < gradeBands.length; i++) {
-                     const band = gradeBands[i];
-                     const rangeNums = band.ranges.map(r => parseFloat(r.replace('%', '')));
-                     const minRange = Math.min(...rangeNums);
-                      // Use >= for the check to include the lower bound
-                     if (average >= minRange) { 
-                         gradeBandId = band.id;
-                         break; // Stop at the first band the average falls into (from highest to lowest)
-                     }
-                 }
-
-                 // Handle edge case: if average is exactly 100%, ensure it gets 'first-plus'
-                  if (average === 100) {
-                      gradeBandId = 'first-plus';
-                  }
-                
-                if (gradeBandId && overallImprovements[gradeBandId]) {
-                    overallAdvice.innerHTML = '';
-                    
-                    overallImprovements[gradeBandId].forEach(advice => {
-                        const li = document.createElement('li');
-                        li.textContent = advice;
-                        overallAdvice.appendChild(li);
-                    });
-                } else {
-                     overallAdvice.innerHTML = '<li>Could not determine overall advice level.</li>'; // Fallback
-                     console.warn("Could not find overall advice for grade band ID:", gradeBandId, "Average:", average);
-                 }
-            }
-            
-            // Save the current profile
-            function saveProfile() {
-                // Create a profile object
-                const now = new Date();
-                const dateString = now.toISOString().slice(0, 10);
-                const timeString = now.toTimeString().slice(0, 5);
-                
-                // Calculate average grade for the profile (using the same logic as updateAverageGrade)
                  const percentages = Object.values(performanceLevels).map(level =>
                      parseFloat(level.percentage.replace('%', ''))
                  );
@@ -1583,110 +1286,195 @@
                  roundedAverage = allSteps.reduce((prev, curr) => {
                      return (Math.abs(curr - average) < Math.abs(prev - average) ? curr : prev);
                  });
-                  if (!allSteps.includes(roundedAverage)) {
+                  if (!allSteps.includes(roundedAverage)) { // Fallback
                       roundedAverage = allSteps.reduce((prev, curr) => 
                            Math.abs(curr - average) < Math.abs(prev - average) ? curr : prev
                       );
                   }
 
-
-                 let gradeBandId = null;
-                 let gradeBandTitle = '';
-                 let letterGrade = '';
+                 let gradeBand = null;
                  for (const band of gradeBands) {
                      const rangeNums = band.ranges.map(r => parseFloat(r.replace('%', '')));
                      const minRange = Math.min(...rangeNums);
                      const maxRange = Math.max(...rangeNums);
                      const epsilon = 0.01;
                      if (roundedAverage >= minRange - epsilon && roundedAverage <= maxRange + epsilon) {
-                         gradeBandId = band.id;
-                         gradeBandTitle = band.title;
-                         letterGrade = band.letterGrade;
+                         gradeBand = band;
                          break;
                      }
                  }
-                 if (!gradeBandId) { // Fallback
-                     gradeBandId = gradeBands[gradeBands.length - 1].id;
-                     gradeBandTitle = gradeBands[gradeBands.length - 1].title;
-                     letterGrade = gradeBands[gradeBands.length - 1].letterGrade;
+                 if (!gradeBand) { // Fallback
+                     gradeBand = gradeBands[gradeBands.length - 1]; 
+                     console.warn("Could not determine grade band for average:", roundedAverage);
                  }
 
+                if (gradeBand) {
+                    gradeDisplay.className = ''; 
+                    gradeDisplay.classList.add('flex', 'items-center', 'justify-center', 'gap-4', 'p-4', 'rounded-md', gradeBand.id); 
+                    gradeDisplay.style.cssText = `
+                        background-color: ${gradeBand.color};
+                        display: flex; 
+                        align-items: center;
+                        justify-content: center;
+                        gap: 16px;
+                        padding: 16px;
+                        border-radius: 2px;
+                    `; // Use cssText to ensure styles are applied reliably
+                    
+                    letterGrade.textContent = gradeBand.letterGrade;
+                    gradeTitle.textContent = gradeBand.title;
+                    numericGrade.textContent = `${roundedAverage}%`;
+                }
+            } // *** ADDED MISSING CLOSING BRACE HERE ***
+            
+            // Update key improvements (remains the same)
+            function updateKeyImprovements() {
+                keyImprovements.innerHTML = '';
+                learningOutcomes.forEach(outcome => {
+                    const feedback = outcome.feedback[performanceLevels[outcome.id].bandId];
+                    const li = document.createElement('li');
+                    li.innerHTML = `<span style="font-weight: 600;">${outcome.title.split(':')[0]}:</span> ${feedback.improvement}`;
+                    keyImprovements.appendChild(li);
+                });
+            }
+            
+            // Update detailed feedback
+            function updateDetailedFeedback() {
+                detailedFeedback.innerHTML = '';
+                learningOutcomes.forEach(outcome => {
+                    const gradeInfo = performanceLevels[outcome.id];
+                    const grade = gradeBands.find(g => g.id === gradeInfo.bandId);
+                    const feedback = outcome.feedback[gradeInfo.bandId];
+                    
+                    const card = document.createElement('div');
+                    card.className = 'feedback-card'; 
+                   
+                    // *** REQUIREMENT 3: Updated labels ***
+                    card.innerHTML = `
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+                            <h3 style="font-weight: bold; margin: 0; padding-right: 10px;">${outcome.title}</h3> <!-- Added padding -->
+                            <div style="display: flex; flex-direction: column; align-items: flex-end; white-space: nowrap;"> <!-- Prevent wrap -->
+                                <span 
+                                    style="padding: 4px 8px; border-radius: 2px; font-size: 0.875rem; font-weight: bold; margin-bottom: 4px; background-color: ${grade?.color || '#ccc'}; color: #333;"
+                                >
+                                    ${grade?.title || 'N/A'}
+                                </span>
+                                <span style="font-size: 0.875rem; font-weight: bold;">${gradeInfo?.percentage || 'N/A'}</span>
+                            </div>
+                        </div>
+                        
+                        <div style="font-size: 0.875rem;">
+                            <div style="margin-bottom: 8px;">
+                                <strong class="section-title">Strengths Evidenced in Your Work:</strong><br>${feedback?.strength || 'N/A'}
+                            </div>
+                            <div style="margin-bottom: 8px;">
+                                <strong class="section-title">Areas for Reflection and Practice:</strong><br>${feedback?.evidence || 'N/A'}
+                            </div>
+                            <div>
+                                <strong class="section-title">Summary:</strong><br>${feedback?.improvement || 'N/A'}
+                            </div>
+                        </div>
+                    `;
+                    
+                    detailedFeedback.appendChild(card);
+                });
+            }
+            
+            // Update overall advice (remains the same)
+            function updateOverallAdvice() {
+                 const percentages = Object.values(performanceLevels).map(level =>
+                     parseFloat(level.percentage.replace('%', ''))
+                 );
+                 const average = percentages.reduce((sum, val) => sum + val, 0) / percentages.length;
+
+                 let gradeBandId = 'fail'; // Default
+                 for (let i = 0; i < gradeBands.length; i++) {
+                     const band = gradeBands[i];
+                     const rangeNums = band.ranges.map(r => parseFloat(r.replace('%', '')));
+                     const minRange = Math.min(...rangeNums);
+                     if (average >= minRange) { 
+                         gradeBandId = band.id;
+                         break; 
+                     }
+                 }
+                  if (average === 100) { gradeBandId = 'first-plus'; }
                 
+                if (gradeBandId && overallImprovements[gradeBandId]) {
+                    overallAdvice.innerHTML = '';
+                    overallImprovements[gradeBandId].forEach(advice => {
+                        const li = document.createElement('li');
+                        li.textContent = advice;
+                        overallAdvice.appendChild(li);
+                    });
+                } else {
+                     overallAdvice.innerHTML = '<li>Could not determine overall advice level.</li>'; 
+                     console.warn("Could not find overall advice for grade band ID:", gradeBandId, "Average:", average);
+                 }
+            }
+            
+            // Save the current profile (remains the same)
+            function saveProfile() {
+                const now = new Date();
+                const dateString = now.toISOString().slice(0, 10);
+                const timeString = now.toTimeString().slice(0, 5);
+                
+                 const percentages = Object.values(performanceLevels).map(level =>
+                     parseFloat(level.percentage.replace('%', ''))
+                 );
+                 const average = percentages.reduce((sum, val) => sum + val, 0) / percentages.length;
+                 let roundedAverage;
+                 const allSteps = gradeBands.flatMap(band => band.ranges.map(r => parseFloat(r.replace('%',''))));
+                 allSteps.sort((a, b) => a - b);
+                 roundedAverage = allSteps.reduce((prev, curr) => (Math.abs(curr - average) < Math.abs(prev - average) ? curr : prev));
+                 if (!allSteps.includes(roundedAverage)) { roundedAverage = allSteps.reduce((prev, curr) => Math.abs(curr - average) < Math.abs(prev - average) ? curr : prev); }
+
+                 let gradeBandId = null, gradeBandTitle = '', letterGrade = '';
+                 for (const band of gradeBands) {
+                     const rangeNums = band.ranges.map(r => parseFloat(r.replace('%', '')));
+                     const minRange = Math.min(...rangeNums), maxRange = Math.max(...rangeNums), epsilon = 0.01;
+                     if (roundedAverage >= minRange - epsilon && roundedAverage <= maxRange + epsilon) {
+                         gradeBandId = band.id; gradeBandTitle = band.title; letterGrade = band.letterGrade; break;
+                     }
+                 }
+                 if (!gradeBandId) { gradeBandId = gradeBands[gradeBands.length - 1].id; gradeBandTitle = gradeBands[gradeBands.length - 1].title; letterGrade = gradeBands[gradeBands.length - 1].letterGrade; }
+
                 const profile = {
-                    id: `profile-${Date.now()}`,
-                    date: `${dateString} ${timeString}`,
-                    performanceLevels: JSON.parse(JSON.stringify(performanceLevels)), // Deep copy
-                    averageGrade: {
-                        bandId: gradeBandId,
-                        bandTitle: gradeBandTitle,
-                        numericValue: roundedAverage,
-                        letterGrade: letterGrade
-                    }
+                    id: `profile-${Date.now()}`, date: `${dateString} ${timeString}`,
+                    performanceLevels: JSON.parse(JSON.stringify(performanceLevels)), 
+                    averageGrade: { bandId: gradeBandId, bandTitle: gradeBandTitle, numericValue: roundedAverage, letterGrade: letterGrade }
                 };
                 
-                // Get existing profiles
                 let existingProfiles = [];
                 try {
                     const storedProfiles = localStorage.getItem('fn4004-assessment-profiles');
-                    if (storedProfiles) {
-                        existingProfiles = JSON.parse(storedProfiles);
-                        // Ensure it's an array
-                        if (!Array.isArray(existingProfiles)) {
-                           existingProfiles = [];
-                        }
-                    }
+                    if (storedProfiles) { existingProfiles = JSON.parse(storedProfiles); if (!Array.isArray(existingProfiles)) { existingProfiles = []; } }
                 } catch (error) {
-                    console.error('Error loading saved profiles:', error);
-                     existingProfiles = []; // Reset if storage is corrupted
-                     localStorage.removeItem('fn4004-assessment-profiles'); // Clear corrupted data
+                    console.error('Error loading saved profiles:', error); existingProfiles = []; localStorage.removeItem('fn4004-assessment-profiles'); 
                 }
                 
-                // Add new profile and save
-                const updatedProfiles = [profile, ...existingProfiles].slice(0, 10); // Keep only 10 most recent
-                try {
-                    localStorage.setItem('fn4004-assessment-profiles', JSON.stringify(updatedProfiles));
-                 } catch (storageError) {
-                     console.error("Error saving profile to localStorage:", storageError);
-                     alert("Could not save profile. Local storage might be full or disabled.");
-                     return; // Stop execution if saving failed
-                 }
+                const updatedProfiles = [profile, ...existingProfiles].slice(0, 10); 
+                try { localStorage.setItem('fn4004-assessment-profiles', JSON.stringify(updatedProfiles)); } 
+                catch (storageError) { console.error("Error saving profile:", storageError); alert("Could not save profile."); return; }
                 
-                // Show success message
                 successMessage.style.display = 'block';
-                setTimeout(() => {
-                    successMessage.style.display = 'none';
-                }, 3000);
+                setTimeout(() => { successMessage.style.display = 'none'; }, 3000);
                 
-                // Enable compare button
-                compareProfilesBtn.disabled = false;
-                compareProfilesBtn.style.opacity = '1';
+                compareProfilesBtn.disabled = false; compareProfilesBtn.style.opacity = '1';
             }
             
-            // Check for saved profiles
+            // Check for saved profiles (remains the same)
             function checkSavedProfiles() {
                 try {
                     const storedProfiles = localStorage.getItem('fn4004-assessment-profiles');
                     if (storedProfiles) {
                         const profiles = JSON.parse(storedProfiles);
-                        if (Array.isArray(profiles) && profiles.length > 0) { // Check if it's a non-empty array
-                            compareProfilesBtn.disabled = false;
-                            compareProfilesBtn.style.opacity = '1';
-                        } else {
-                             compareProfilesBtn.disabled = true;
-                             compareProfilesBtn.style.opacity = '0.5';
-                         }
-                    } else {
-                         compareProfilesBtn.disabled = true;
-                         compareProfilesBtn.style.opacity = '0.5';
-                     }
-                } catch (error) {
-                    console.error('Error checking saved profiles:', error);
-                     compareProfilesBtn.disabled = true; // Disable button on error
-                     compareProfilesBtn.style.opacity = '0.5';
-                }
+                        if (Array.isArray(profiles) && profiles.length > 0) { compareProfilesBtn.disabled = false; compareProfilesBtn.style.opacity = '1'; } 
+                        else { compareProfilesBtn.disabled = true; compareProfilesBtn.style.opacity = '0.5'; }
+                    } else { compareProfilesBtn.disabled = true; compareProfilesBtn.style.opacity = '0.5'; }
+                } catch (error) { console.error('Error checking saved profiles:', error); compareProfilesBtn.disabled = true; compareProfilesBtn.style.opacity = '0.5'; }
             }
             
-            // Update compare modal
+            // Update compare modal (remains the same)
             function updateCompareModal() {
                 const hasProfilesDiv = document.getElementById('has-profiles');
                 const noProfilesDiv = document.getElementById('no-profiles');
@@ -1697,371 +1485,171 @@
                 try {
                     const storedProfiles = localStorage.getItem('fn4004-assessment-profiles');
                     let profiles = [];
-                    if (storedProfiles) {
-                         profiles = JSON.parse(storedProfiles);
-                         // Ensure it's an array
-                         if (!Array.isArray(profiles)) {
-                             profiles = [];
-                         }
-                     }
+                    if (storedProfiles) { profiles = JSON.parse(storedProfiles); if (!Array.isArray(profiles)) { profiles = []; } }
 
                     if (profiles.length > 0) {
-                            // Show profiles content
-                            hasProfilesDiv.style.display = 'block';
-                            noProfilesDiv.style.display = 'none';
+                            hasProfilesDiv.style.display = 'block'; noProfilesDiv.style.display = 'none';
                             
-                            // Create progress table
-                            let tableHtml = `
-                                <thead>
-                                    <tr>
-                                        <th>Date</th>
-                                        <th>Average Grade</th>
-                                        ${learningOutcomes.map(outcome => 
-                                            `<th>${outcome.title.split(':')[0]}</th>`
-                                        ).join('')}
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td style="font-weight: bold;">Current</td>
-                                        <td style="font-weight: bold; text-align: center;">
-                            `;
-                            
-                            // Calculate current average (using the same logic as updateAverageGrade)
-                             const percentages = Object.values(performanceLevels).map(level =>
-                                 parseFloat(level.percentage.replace('%', ''))
-                             );
+                            // Calculate current average (duplicate logic needed here too)
+                             const percentages = Object.values(performanceLevels).map(level => parseFloat(level.percentage.replace('%', '')));
                              const average = percentages.reduce((sum, val) => sum + val, 0) / percentages.length;
-
                              let roundedAverage;
                              const allSteps = gradeBands.flatMap(band => band.ranges.map(r => parseFloat(r.replace('%',''))));
                              allSteps.sort((a, b) => a - b);
-                             roundedAverage = allSteps.reduce((prev, curr) => {
-                                 return (Math.abs(curr - average) < Math.abs(prev - average) ? curr : prev);
-                             });
-                              if (!allSteps.includes(roundedAverage)) {
-                                 roundedAverage = allSteps.reduce((prev, curr) => 
-                                     Math.abs(curr - average) < Math.abs(prev - average) ? curr : prev
-                                 );
-                             }
-
+                             roundedAverage = allSteps.reduce((prev, curr) => (Math.abs(curr - average) < Math.abs(prev - average) ? curr : prev));
+                             if (!allSteps.includes(roundedAverage)) { roundedAverage = allSteps.reduce((prev, curr) => Math.abs(curr - average) < Math.abs(prev - average) ? curr : prev); }
                              let letterGrade = '';
                              for (const band of gradeBands) {
                                  const rangeNums = band.ranges.map(r => parseFloat(r.replace('%', '')));
-                                 const minRange = Math.min(...rangeNums);
-                                 const maxRange = Math.max(...rangeNums);
-                                 const epsilon = 0.01;
-                                 if (roundedAverage >= minRange - epsilon && roundedAverage <= maxRange + epsilon) {
-                                     letterGrade = band.letterGrade;
-                                     break;
-                                 }
+                                 const minRange = Math.min(...rangeNums), maxRange = Math.max(...rangeNums), epsilon = 0.01;
+                                 if (roundedAverage >= minRange - epsilon && roundedAverage <= maxRange + epsilon) { letterGrade = band.letterGrade; break; }
                              }
-                             if (!letterGrade) { // Fallback
-                                letterGrade = gradeBands[gradeBands.length - 1].letterGrade;
-                             }
+                             if (!letterGrade) { letterGrade = gradeBands[gradeBands.length - 1].letterGrade; }
 
+                            let tableHtml = `
+                                <thead><tr><th>Date</th><th>Average Grade</th>
+                                ${learningOutcomes.map(o => `<th>${o.title.split(':')[0]}</th>`).join('')}</tr></thead>
+                                <tbody><tr><td style="font-weight: bold;">Current</td><td style="font-weight: bold; text-align: center;">
+                                ${roundedAverage}% (${letterGrade})</td>`;
                             
-                            tableHtml += `${roundedAverage}% (${letterGrade})</td>`;
-                            
-                            // Add outcome grades
                             for (const outcome of learningOutcomes) {
-                                const gradeId = performanceLevels[outcome.id].bandId;
-                                const grade = gradeBands.find(g => g.id === gradeId);
-                                
-                                tableHtml += `
-                                    <td style="text-align: center; background-color: ${grade?.color || '#ccc'};"> <!-- Added fallback color -->
-                                        ${performanceLevels[outcome.id].percentage}
-                                    </td>
-                                `;
+                                const grade = gradeBands.find(g => g.id === performanceLevels[outcome.id].bandId);
+                                tableHtml += `<td style="text-align: center; background-color: ${grade?.color || '#ccc'};">${performanceLevels[outcome.id].percentage}</td>`;
                             }
-                            
                             tableHtml += `</tr>`;
                             
-                            // Add saved profiles
                             profiles.forEach(profile => {
-                                tableHtml += `
-                                    <tr>
-                                        <td>${profile.date || 'N/A'}</td>
-                                        <td style="text-align: center;">
-                                            ${profile.averageGrade?.numericValue !== undefined ? profile.averageGrade.numericValue + '%' : 'N/A'} 
-                                            (${profile.averageGrade?.letterGrade || 'N/A'})
-                                        </td>
-                                `;
-                                
-                                // Add outcome grades
+                                tableHtml += `<tr><td>${profile.date || 'N/A'}</td><td style="text-align: center;">
+                                ${profile.averageGrade?.numericValue !== undefined ? profile.averageGrade.numericValue + '%' : 'N/A'} (${profile.averageGrade?.letterGrade || 'N/A'})</td>`;
                                 for (const outcome of learningOutcomes) {
-                                    // Check if profile.performanceLevels exists and has the outcome
                                     const levelInfo = profile.performanceLevels && profile.performanceLevels[outcome.id]; 
                                     if (levelInfo && levelInfo.bandId) {
                                         const grade = gradeBands.find(g => g.id === levelInfo.bandId);
-                                        
-                                        tableHtml += `
-                                            <td style="text-align: center; background-color: ${grade?.color || '#ccc'};"> <!-- Added fallback color -->
-                                                ${levelInfo.percentage || 'N/A'}
-                                            </td>
-                                        `;
-                                    } else {
-                                        tableHtml += `<td>N/A</td>`; // Handle missing data gracefully
-                                    }
+                                        tableHtml += `<td style="text-align: center; background-color: ${grade?.color || '#ccc'};">${levelInfo.percentage || 'N/A'}</td>`;
+                                    } else { tableHtml += `<td>N/A</td>`; }
                                 }
-                                
                                 tableHtml += `</tr>`;
                             });
-                            
                             tableHtml += `</tbody>`;
                             progressTable.innerHTML = tableHtml;
                             
-                            // Create improvement analysis (compared to most recent saved profile)
                             if (profiles.length > 0) {
                                 const mostRecentProfile = profiles[0];
                                 previousDate.textContent = `Compared to previous assessment (${mostRecentProfile.date || 'N/A'}):`;
-                                
                                 improvementList.innerHTML = '';
                                 
-                                // Analyze improvements for each outcome
                                 learningOutcomes.forEach(outcome => {
                                     const currentPercentage = parseFloat(performanceLevels[outcome.id].percentage);
-                                    // Safely access previous percentage
                                     const previousLevelInfo = mostRecentProfile.performanceLevels && mostRecentProfile.performanceLevels[outcome.id];
-                                    const previousPercentage = previousLevelInfo ? parseFloat(previousLevelInfo.percentage) : NaN; // Use NaN if missing
-                                    
-                                    let changeText = 'N/A';
-                                    let changeClass = 'improvement-neutral';
-
+                                    const previousPercentage = previousLevelInfo ? parseFloat(previousLevelInfo.percentage) : NaN; 
+                                    let changeText = 'N/A', changeClass = 'improvement-neutral';
                                     if (!isNaN(currentPercentage) && !isNaN(previousPercentage)) {
                                          const difference = currentPercentage - previousPercentage;
-                                         if (difference > 0) {
-                                             changeText = `improved by ${difference.toFixed(0)}%`; // Use toFixed(0) for whole percentages
-                                             changeClass = 'improvement-positive';
-                                         } else if (difference < 0) {
-                                             changeText = `decreased by ${Math.abs(difference).toFixed(0)}%`;
-                                             changeClass = 'improvement-negative';
-                                         } else {
-                                             changeText = 'unchanged';
-                                             changeClass = 'improvement-neutral';
-                                         }
-                                     } else if (isNaN(previousPercentage)) {
-                                         changeText = 'newly assessed'; // Or some other indicator
-                                         changeClass = 'improvement-neutral';
-                                     }
-
-                                    
+                                         if (difference > 0) { changeText = `improved by ${difference.toFixed(0)}%`; changeClass = 'improvement-positive'; } 
+                                         else if (difference < 0) { changeText = `decreased by ${Math.abs(difference).toFixed(0)}%`; changeClass = 'improvement-negative'; } 
+                                         else { changeText = 'unchanged'; changeClass = 'improvement-neutral'; }
+                                     } else if (isNaN(previousPercentage)) { changeText = 'newly assessed'; changeClass = 'improvement-neutral'; }
                                     const li = document.createElement('li');
-                                    li.innerHTML = `
-                                        <span style="font-weight: 600;">${outcome.title.split(':')[0]}:</span> 
-                                        <span class="${changeClass}">${changeText}</span>
-                                    `;
+                                    li.innerHTML = `<span style="font-weight: 600;">${outcome.title.split(':')[0]}:</span> <span class="${changeClass}">${changeText}</span>`;
                                     improvementList.appendChild(li);
                                 });
                                 
-                                // Overall change
-                                const currentAvg = roundedAverage; // From current calculation
-                                const previousAvg = mostRecentProfile.averageGrade?.numericValue; // Safely access
-                                
-                                let changeText = 'N/A';
-                                let changeClass = 'improvement-neutral';
-
+                                const currentAvg = roundedAverage; 
+                                const previousAvg = mostRecentProfile.averageGrade?.numericValue; 
+                                let changeText = 'N/A', changeClass = 'improvement-neutral';
                                  if (previousAvg !== undefined && !isNaN(currentAvg) && !isNaN(previousAvg)) {
                                      const difference = currentAvg - previousAvg;
-                                     if (difference > 0) {
-                                         changeText = `improved by ${difference.toFixed(0)}%`;
-                                         changeClass = 'improvement-positive';
-                                     } else if (difference < 0) {
-                                         changeText = `decreased by ${Math.abs(difference).toFixed(0)}%`;
-                                         changeClass = 'improvement-negative';
-                                     } else {
-                                         changeText = 'unchanged';
-                                         changeClass = 'improvement-neutral';
-                                     }
-                                 } else if (previousAvg === undefined) {
-                                       changeText = 'no previous average';
-                                       changeClass = 'improvement-neutral';
-                                  }
-
-                                
+                                     if (difference > 0) { changeText = `improved by ${difference.toFixed(0)}%`; changeClass = 'improvement-positive'; } 
+                                     else if (difference < 0) { changeText = `decreased by ${Math.abs(difference).toFixed(0)}%`; changeClass = 'improvement-negative'; } 
+                                     else { changeText = 'unchanged'; changeClass = 'improvement-neutral'; }
+                                 } else if (previousAvg === undefined) { changeText = 'no previous average'; changeClass = 'improvement-neutral'; }
                                 const li = document.createElement('li');
-                                li.className = 'font-semibold mt-2';
-                                li.style.fontWeight = '600';
-                                li.style.marginTop = '8px';
-                                li.innerHTML = `
-                                    <span>Overall grade:</span> 
-                                    <span class="${changeClass}">${changeText}</span>
-                                `;
+                                li.className = 'font-semibold mt-2'; li.style.fontWeight = '600'; li.style.marginTop = '8px';
+                                li.innerHTML = `<span>Overall grade:</span> <span class="${changeClass}">${changeText}</span>`;
                                 improvementList.appendChild(li);
-                            } else {
-                                 previousDate.textContent = 'No previous assessment to compare.';
-                                 improvementList.innerHTML = '';
-                             }
-                            
-                        } else {
-                            // No profiles
-                            hasProfilesDiv.style.display = 'none';
-                            noProfilesDiv.style.display = 'block';
-                        }
-                    
+                            } else { previousDate.textContent = 'No previous assessment to compare.'; improvementList.innerHTML = ''; }
+                        } else { hasProfilesDiv.style.display = 'none'; noProfilesDiv.style.display = 'block'; }
                 } catch (error) {
                     console.error('Error updating compare modal:', error);
-                    // Show error or no profiles state
-                    hasProfilesDiv.style.display = 'none';
-                    noProfilesDiv.style.display = 'block';
+                    hasProfilesDiv.style.display = 'none'; noProfilesDiv.style.display = 'block';
                     noProfilesDiv.innerHTML = '<p>Error loading comparison data.</p>';
                 }
             }
             
-            // Print assessment summary
+            // Print assessment summary (remains the same, check content carefully)
             function printSummary() {
                 const printWindow = window.open('', '_blank');
+                if (!printWindow) { alert('Please allow pop-ups to print the assessment summary.'); return; }
                 
-                if (!printWindow) {
-                    alert('Please allow pop-ups to print the assessment summary.');
-                    return;
-                }
-                
-                // Calculate average grade (using the same logic as updateAverageGrade)
-                 const percentages = Object.values(performanceLevels).map(level =>
-                     parseFloat(level.percentage.replace('%', ''))
-                 );
+                // Calculate average grade (duplicate logic needed here too)
+                 const percentages = Object.values(performanceLevels).map(level => parseFloat(level.percentage.replace('%', '')));
                  const average = percentages.reduce((sum, val) => sum + val, 0) / percentages.length;
-
                  let roundedAverage;
                  const allSteps = gradeBands.flatMap(band => band.ranges.map(r => parseFloat(r.replace('%',''))));
                  allSteps.sort((a, b) => a - b);
-                 roundedAverage = allSteps.reduce((prev, curr) => {
-                     return (Math.abs(curr - average) < Math.abs(prev - average) ? curr : prev);
-                 });
-                  if (!allSteps.includes(roundedAverage)) {
-                      roundedAverage = allSteps.reduce((prev, curr) => 
-                           Math.abs(curr - average) < Math.abs(prev - average) ? curr : prev
-                      );
-                  }
-
-                 let gradeBandId = null;
-                 let gradeBandTitle = '';
-                 let letterGrade = '';
+                 roundedAverage = allSteps.reduce((prev, curr) => (Math.abs(curr - average) < Math.abs(prev - average) ? curr : prev));
+                  if (!allSteps.includes(roundedAverage)) { roundedAverage = allSteps.reduce((prev, curr) => Math.abs(curr - average) < Math.abs(prev - average) ? curr : prev); }
+                 let gradeBandId = null, gradeBandTitle = '', letterGrade = '';
                  for (const band of gradeBands) {
                      const rangeNums = band.ranges.map(r => parseFloat(r.replace('%', '')));
-                     const minRange = Math.min(...rangeNums);
-                     const maxRange = Math.max(...rangeNums);
-                     const epsilon = 0.01;
+                     const minRange = Math.min(...rangeNums), maxRange = Math.max(...rangeNums), epsilon = 0.01;
                      if (roundedAverage >= minRange - epsilon && roundedAverage <= maxRange + epsilon) {
-                         gradeBandId = band.id;
-                         gradeBandTitle = band.title;
-                         letterGrade = band.letterGrade;
-                         break;
+                         gradeBandId = band.id; gradeBandTitle = band.title; letterGrade = band.letterGrade; break;
                      }
                  }
-                  if (!gradeBandId) { // Fallback
-                     gradeBandId = gradeBands[gradeBands.length - 1].id;
-                     gradeBandTitle = gradeBands[gradeBands.length - 1].title;
-                     letterGrade = gradeBands[gradeBands.length - 1].letterGrade;
-                 }
+                 if (!gradeBandId) { gradeBandId = gradeBands[gradeBands.length - 1].id; gradeBandTitle = gradeBands[gradeBands.length - 1].title; letterGrade = gradeBands[gradeBands.length - 1].letterGrade; }
 
-                
-                // Create print content
                 printWindow.document.write(`
                     <!DOCTYPE html>
-                    <html>
-                    <head>
-                        <title>FN4004 Assessment Summary</title>
+                    <html><head><title>FN4004 Assessment Summary</title>
                         <style>
                             body { font-family: Arial, sans-serif; padding: 20px; max-width: 800px; margin: 0 auto; line-height: 1.5; }
                             .header { text-align: center; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid #ccc; }
-                            .header h1 { font-size: 20px; margin-bottom: 5px; }
-                            .header h2 { font-size: 16px; margin-bottom: 10px; color: #555; }
+                            .header h1 { font-size: 20px; margin-bottom: 5px; } .header h2 { font-size: 16px; margin-bottom: 10px; color: #555; }
                             .summary-box { border: 1px solid #ccc; padding: 15px; margin-bottom: 20px; background-color: #f9f9f9; }
                             .outcome { margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px dashed #eee; }
                             .outcome:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
-                            .outcome h4 { font-size: 14px; margin-top: 0; margin-bottom: 5px; }
-                            .outcome p { font-size: 13px; margin: 3px 0; }
+                            .outcome h4 { font-size: 14px; margin-top: 0; margin-bottom: 5px; } .outcome p { font-size: 13px; margin: 3px 0; }
                             .grade-band { font-weight: bold; margin-bottom: 5px; font-size: 13px; }
                             .average-grade { font-size: 20px; font-weight: bold; text-align: center; margin: 20px 0; }
                             .date { text-align: right; font-style: italic; margin-bottom: 20px; font-size: 12px; }
                             .footer { margin-top: 30px; font-size: 11px; text-align: center; color: #666; border-top: 1px solid #eee; padding-top: 15px; }
                             h3 { font-size: 16px; margin-top: 25px; margin-bottom: 10px; border-bottom: 1px solid #ddd; padding-bottom: 5px; }
-                            ul { padding-left: 20px; margin: 10px 0; }
-                            li { font-size: 13px; margin-bottom: 5px; }
+                            ul { padding-left: 20px; margin: 10px 0; } li { font-size: 13px; margin-bottom: 5px; }
                             strong { font-weight: 600; }
-                            @media print {
-                                body { max-width: 100%; padding: 10px; }
-                                .footer { page-break-after: avoid; }
-                                .outcome { page-break-inside: avoid; }
-                            }
-                        </style>
-                    </head>
-                    <body>
-                        <div class="header">
-                            <h1>FN4004 Design Process 1</h1>
-                            <h2>Assessment Profile Summary</h2>
-                        </div>
-                        
+                            @media print { body { max-width: 100%; padding: 10px; } .footer { page-break-after: avoid; } .outcome { page-break-inside: avoid; } }
+                        </style></head><body>
+                        <div class="header"><h1>FN4004 Design Process 1</h1><h2>Assessment Profile Summary</h2></div>
                         <div class="date">Date: ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>
-                        
-                        <div class="summary-box">
-                            <h3>Overall Assessment</h3>
-                            <div class="average-grade">
-                                ${roundedAverage}% (${letterGrade} - ${gradeBandTitle})
-                            </div>
-                        </div>
-                        
+                        <div class="summary-box"><h3>Overall Assessment</h3><div class="average-grade">${roundedAverage}% (${letterGrade} - ${gradeBandTitle})</div></div>
                         <h3>Learning Outcomes Assessment</h3>
-                        
                         ${learningOutcomes.map(outcome => {
                             const gradeInfo = performanceLevels[outcome.id];
                             const grade = gradeBands.find(g => g.id === gradeInfo.bandId);
-                            // Use the updated feedback labels
                             const feedback = outcome.feedback[gradeInfo.bandId]; 
-                            
-                            return `
-                                <div class="outcome">
-                                    <h4>${outcome.title}</h4>
-                                     <!-- <p>${outcome.description}</p> --> <!-- Optional: Include description? -->
-                                    <div class="grade-band">Grade: ${grade?.title || 'N/A'} (${gradeInfo?.percentage || 'N/A'})</div>
-                                    <p><strong>Strengths Evidenced in Your Work:</strong> ${feedback?.strength || 'N/A'}</p>
-                                    <p><strong>Areas for Reflection and Practice:</strong> ${feedback?.evidence || 'N/A'}</p>
-                                    <p><strong>Summary:</strong> ${feedback?.improvement || 'N/A'}</p>
-                                </div>
-                            `;
+                            return \`<div class="outcome"><h4>${outcome.title}</h4>
+                                <div class="grade-band">Grade: ${grade?.title || 'N/A'} (${gradeInfo?.percentage || 'N/A'})</div>
+                                <p><strong>Strengths Evidenced in Your Work:</strong> ${feedback?.strength || 'N/A'}</p>
+                                <p><strong>Areas for Reflection and Practice:</strong> ${feedback?.evidence || 'N/A'}</p>
+                                <p><strong>Summary:</strong> ${feedback?.improvement || 'N/A'}</p></div>\`;
                         }).join('')}
-                        
                         <h3>Key Areas for Overall Improvement</h3>
-                        <ul>
-                            ${overallImprovements[gradeBandId]?.map(advice => 
-                                `<li>${advice}</li>`
-                            ).join('') || '<li>N/A</li>'}
-                        </ul>
-                        
-                        <div class="footer">
-                            <p>This assessment summary is for reference only and not an official grade.</p>
-                            <p>Kingston School of Art - BA (Hons) Fashion Program – FN4004 Design Process 1</p>
-                            <p>© ${new Date().getFullYear()} Kingston University</p>
-                        </div>
-                    </body>
-                    </html>
+                        <ul>${overallImprovements[gradeBandId]?.map(advice => \`<li>${advice}</li>\`).join('') || '<li>N/A</li>'}</ul>
+                        <div class="footer"><p>This assessment summary is for reference only and not an official grade.</p>
+                        <p>Kingston School of Art - BA (Hons) Fashion Program – FN4004 Design Process 1</p>
+                        <p>© ${new Date().getFullYear()} Kingston University</p></div>
+                    </body></html>
                 `);
-                
                 printWindow.document.close();
-                
-                // Wait slightly longer for content and styles to render before printing
                  setTimeout(() => {
-                     try {
-                         printWindow.focus(); // Focus the window before printing
-                         printWindow.print();
-                         // Optional: Close after printing attempt (might close before print dialog appears)
-                         // printWindow.close(); 
-                     } catch (e) {
-                         console.error("Printing failed:", e);
-                         alert("Could not print the summary automatically. Please use the browser's print function (Ctrl+P or Cmd+P).");
-                     }
-                 }, 750); // Increased delay slightly
+                     try { printWindow.focus(); printWindow.print(); } 
+                     catch (e) { console.error("Printing failed:", e); alert("Could not print automatically. Please use browser's print function."); }
+                 }, 750); 
             }
-
-            // --- Add Chart.js Library ---
-            // Include Chart.js library (e.g., via CDN) in the <head> or before this script
-            // Example: <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
         });
     </script>
-     <!-- Include Chart.js library -->
-     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+   
 </body>
 </html>
+```
