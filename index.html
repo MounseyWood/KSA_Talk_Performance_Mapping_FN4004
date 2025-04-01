@@ -15,6 +15,9 @@
             margin: 0;
             color: #333;
             line-height: 1.6;
+            /* Added for potential font issues mentioned in console */
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
         
         .content-wrapper {
@@ -1205,7 +1208,10 @@
            function updatePerformanceChart() {
                if (!Chart) { // Check if Chart.js is loaded
                     console.error("Chart.js library not loaded.");
-                    performanceChartElement.parentElement.innerHTML = '<p style="text-align: center; color: red;">Error: Chart library not loaded.</p>';
+                    const chartContainer = document.getElementById('performance-chart-container');
+                    if (chartContainer) {
+                         chartContainer.innerHTML = '<p style="text-align: center; color: red;">Error: Chart library not loaded.</p>';
+                     }
                     return;
                 }
                const ctx = performanceChartElement.getContext('2d');
@@ -1215,7 +1221,8 @@
                const dataValues = learningOutcomes.map(outcome => {
                    const gradeId = performanceLevels[outcome.id].bandId;
                    const gradeIndex = gradeBands.findIndex(g => g.id === gradeId);
-                   return gradeBands.length - 1 - gradeIndex; 
+                    // Ensure index is valid before calculation
+                   return gradeIndex !== -1 ? gradeBands.length - 1 - gradeIndex : 0; 
                });
 
                const labels = learningOutcomes.map(outcome => outcome.title.split(':')[0]); 
@@ -1261,10 +1268,11 @@
                                 callbacks: {
                                     label: function(context) {
                                         const outcomeIndex = context.dataIndex;
+                                        if (outcomeIndex < 0 || outcomeIndex >= learningOutcomes.length) return ''; // Basic bounds check
                                         const outcomeId = learningOutcomes[outcomeIndex].id;
                                         const gradeInfo = performanceLevels[outcomeId];
-                                        const grade = gradeBands.find(g => g.id === gradeInfo.bandId);
-                                        return `${grade.title} (${gradeInfo.percentage})`;
+                                        const grade = gradeBands.find(g => g.id === gradeInfo?.bandId); // Check gradeInfo exists
+                                        return grade ? `${grade.title} (${gradeInfo.percentage})` : 'N/A';
                                     }
                                 }
                            }
@@ -1273,22 +1281,39 @@
                });
            }
             
-            // Calculate and update average grade
+            // Calculate and update average grade (remains the same)
             function updateAverageGrade() {
                  const percentages = Object.values(performanceLevels).map(level =>
                      parseFloat(level.percentage.replace('%', ''))
                  );
-                 const average = percentages.reduce((sum, val) => sum + val, 0) / percentages.length;
+                 // Filter out NaN values just in case
+                 const validPercentages = percentages.filter(p => !isNaN(p));
+                 if (validPercentages.length === 0) {
+                     // Handle case with no valid percentages
+                     gradeDisplay.style.backgroundColor = '#ccc';
+                     letterGrade.textContent = '?';
+                     gradeTitle.textContent = 'N/A';
+                     numericGrade.textContent = '--%';
+                     return;
+                 }
+
+                 const average = validPercentages.reduce((sum, val) => sum + val, 0) / validPercentages.length;
+
 
                  let roundedAverage;
                  const allSteps = gradeBands.flatMap(band => band.ranges.map(r => parseFloat(r.replace('%',''))));
                  allSteps.sort((a, b) => a - b);
+                 // Ensure average is within the bounds of available steps
+                 const minStep = allSteps[0];
+                 const maxStep = allSteps[allSteps.length - 1];
+                 const clampedAverage = Math.max(minStep, Math.min(average, maxStep));
+
                  roundedAverage = allSteps.reduce((prev, curr) => {
-                     return (Math.abs(curr - average) < Math.abs(prev - average) ? curr : prev);
+                     return (Math.abs(curr - clampedAverage) < Math.abs(prev - clampedAverage) ? curr : prev);
                  });
                   if (!allSteps.includes(roundedAverage)) { // Fallback
                       roundedAverage = allSteps.reduce((prev, curr) => 
-                           Math.abs(curr - average) < Math.abs(prev - average) ? curr : prev
+                           Math.abs(curr - clampedAverage) < Math.abs(prev - clampedAverage) ? curr : prev
                       );
                   }
 
@@ -1325,58 +1350,63 @@
                     gradeTitle.textContent = gradeBand.title;
                     numericGrade.textContent = `${roundedAverage}%`;
                 }
-            } // *** ADDED MISSING CLOSING BRACE HERE ***
+            } 
             
             // Update key improvements (remains the same)
             function updateKeyImprovements() {
                 keyImprovements.innerHTML = '';
                 learningOutcomes.forEach(outcome => {
-                    const feedback = outcome.feedback[performanceLevels[outcome.id].bandId];
-                    const li = document.createElement('li');
-                    li.innerHTML = `<span style="font-weight: 600;">${outcome.title.split(':')[0]}:</span> ${feedback.improvement}`;
-                    keyImprovements.appendChild(li);
+                    // Ensure performanceLevels[outcome.id] and its bandId exist
+                    const level = performanceLevels[outcome.id];
+                    if (level && level.bandId) {
+                        const feedback = outcome.feedback[level.bandId];
+                        if (feedback && feedback.improvement) {
+                            const li = document.createElement('li');
+                            li.innerHTML = `<span style="font-weight: 600;">${outcome.title.split(':')[0]}:</span> ${feedback.improvement}`;
+                            keyImprovements.appendChild(li);
+                        }
+                    }
                 });
             }
             
-            // Update detailed feedback
+            // Update detailed feedback (remains the same)
             function updateDetailedFeedback() {
                 detailedFeedback.innerHTML = '';
                 learningOutcomes.forEach(outcome => {
                     const gradeInfo = performanceLevels[outcome.id];
-                    const grade = gradeBands.find(g => g.id === gradeInfo.bandId);
-                    const feedback = outcome.feedback[gradeInfo.bandId];
-                    
-                    const card = document.createElement('div');
-                    card.className = 'feedback-card'; 
-                   
-                    // *** REQUIREMENT 3: Updated labels ***
-                    card.innerHTML = `
-                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
-                            <h3 style="font-weight: bold; margin: 0; padding-right: 10px;">${outcome.title}</h3> <!-- Added padding -->
-                            <div style="display: flex; flex-direction: column; align-items: flex-end; white-space: nowrap;"> <!-- Prevent wrap -->
-                                <span 
-                                    style="padding: 4px 8px; border-radius: 2px; font-size: 0.875rem; font-weight: bold; margin-bottom: 4px; background-color: ${grade?.color || '#ccc'}; color: #333;"
-                                >
-                                    ${grade?.title || 'N/A'}
-                                </span>
-                                <span style="font-size: 0.875rem; font-weight: bold;">${gradeInfo?.percentage || 'N/A'}</span>
-                            </div>
-                        </div>
+                    // Ensure gradeInfo and bandId exist
+                    if (gradeInfo && gradeInfo.bandId) {
+                        const grade = gradeBands.find(g => g.id === gradeInfo.bandId);
+                        const feedback = outcome.feedback[gradeInfo.bandId];
                         
-                        <div style="font-size: 0.875rem;">
-                            <div style="margin-bottom: 8px;">
-                                <strong class="section-title">Strengths Evidenced in Your Work:</strong><br>${feedback?.strength || 'N/A'}
+                        const card = document.createElement('div');
+                        card.className = 'feedback-card'; 
+                       
+                        card.innerHTML = `
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+                                <h3 style="font-weight: bold; margin: 0; padding-right: 10px;">${outcome.title}</h3> 
+                                <div style="display: flex; flex-direction: column; align-items: flex-end; white-space: nowrap;"> 
+                                    <span 
+                                        style="padding: 4px 8px; border-radius: 2px; font-size: 0.875rem; font-weight: bold; margin-bottom: 4px; background-color: ${grade?.color || '#ccc'}; color: #333;"
+                                    >
+                                        ${grade?.title || 'N/A'}
+                                    </span>
+                                    <span style="font-size: 0.875rem; font-weight: bold;">${gradeInfo?.percentage || 'N/A'}</span>
+                                </div>
                             </div>
-                            <div style="margin-bottom: 8px;">
-                                <strong class="section-title">Areas for Reflection and Practice:</strong><br>${feedback?.evidence || 'N/A'}
-                            </div>
-                            <div>
-                                <strong class="section-title">Summary:</strong><br>${feedback?.improvement || 'N/A'}
-                            </div>
-                        </div>
-                    `;
-                    
-                    detailedFeedback.appendChild(card);
+                            <div style="font-size: 0.875rem;">
+                                <div style="margin-bottom: 8px;">
+                                    <strong class="section-title">Strengths Evidenced in Your Work:</strong><br>${feedback?.strength || 'N/A'}
+                                </div>
+                                <div style="margin-bottom: 8px;">
+                                    <strong class="section-title">Areas for Reflection and Practice:</strong><br>${feedback?.evidence || 'N/A'}
+                                </div>
+                                <div>
+                                    <strong class="section-title">Summary:</strong><br>${feedback?.improvement || 'N/A'}
+                                </div>
+                            </div>`;
+                        detailedFeedback.appendChild(card);
+                    }
                 });
             }
             
@@ -1385,18 +1415,25 @@
                  const percentages = Object.values(performanceLevels).map(level =>
                      parseFloat(level.percentage.replace('%', ''))
                  );
-                 const average = percentages.reduce((sum, val) => sum + val, 0) / percentages.length;
+                  const validPercentages = percentages.filter(p => !isNaN(p));
+                  if (validPercentages.length === 0) {
+                      overallAdvice.innerHTML = '<li>Cannot determine advice level.</li>';
+                      return;
+                  }
+                 const average = validPercentages.reduce((sum, val) => sum + val, 0) / validPercentages.length;
 
                  let gradeBandId = 'fail'; // Default
                  for (let i = 0; i < gradeBands.length; i++) {
                      const band = gradeBands[i];
                      const rangeNums = band.ranges.map(r => parseFloat(r.replace('%', '')));
                      const minRange = Math.min(...rangeNums);
+                      // Using >= check from highest to lowest
                      if (average >= minRange) { 
                          gradeBandId = band.id;
                          break; 
                      }
                  }
+                  // Edge case for 100%
                   if (average === 100) { gradeBandId = 'first-plus'; }
                 
                 if (gradeBandId && overallImprovements[gradeBandId]) {
@@ -1421,12 +1458,17 @@
                  const percentages = Object.values(performanceLevels).map(level =>
                      parseFloat(level.percentage.replace('%', ''))
                  );
-                 const average = percentages.reduce((sum, val) => sum + val, 0) / percentages.length;
+                 const validPercentages = percentages.filter(p => !isNaN(p));
+                 if (validPercentages.length === 0) { alert("Cannot save profile with invalid performance levels."); return; }
+                 const average = validPercentages.reduce((sum, val) => sum + val, 0) / validPercentages.length;
+
                  let roundedAverage;
                  const allSteps = gradeBands.flatMap(band => band.ranges.map(r => parseFloat(r.replace('%',''))));
                  allSteps.sort((a, b) => a - b);
-                 roundedAverage = allSteps.reduce((prev, curr) => (Math.abs(curr - average) < Math.abs(prev - average) ? curr : prev));
-                 if (!allSteps.includes(roundedAverage)) { roundedAverage = allSteps.reduce((prev, curr) => Math.abs(curr - average) < Math.abs(prev - average) ? curr : prev); }
+                 const minStep = allSteps[0], maxStep = allSteps[allSteps.length - 1];
+                 const clampedAverage = Math.max(minStep, Math.min(average, maxStep));
+                 roundedAverage = allSteps.reduce((prev, curr) => (Math.abs(curr - clampedAverage) < Math.abs(prev - clampedAverage) ? curr : prev));
+                 if (!allSteps.includes(roundedAverage)) { roundedAverage = allSteps.reduce((prev, curr) => Math.abs(curr - clampedAverage) < Math.abs(prev - clampedAverage) ? curr : prev); }
 
                  let gradeBandId = null, gradeBandTitle = '', letterGrade = '';
                  for (const band of gradeBands) {
@@ -1492,12 +1534,17 @@
                             
                             // Calculate current average (duplicate logic needed here too)
                              const percentages = Object.values(performanceLevels).map(level => parseFloat(level.percentage.replace('%', '')));
-                             const average = percentages.reduce((sum, val) => sum + val, 0) / percentages.length;
+                             const validPercentages = percentages.filter(p => !isNaN(p));
+                             if (validPercentages.length === 0) { /* Handle error or default state */ return; }
+                             const average = validPercentages.reduce((sum, val) => sum + val, 0) / validPercentages.length;
+
                              let roundedAverage;
                              const allSteps = gradeBands.flatMap(band => band.ranges.map(r => parseFloat(r.replace('%',''))));
                              allSteps.sort((a, b) => a - b);
-                             roundedAverage = allSteps.reduce((prev, curr) => (Math.abs(curr - average) < Math.abs(prev - average) ? curr : prev));
-                             if (!allSteps.includes(roundedAverage)) { roundedAverage = allSteps.reduce((prev, curr) => Math.abs(curr - average) < Math.abs(prev - average) ? curr : prev); }
+                             const minStep = allSteps[0], maxStep = allSteps[allSteps.length - 1];
+                             const clampedAverage = Math.max(minStep, Math.min(average, maxStep));
+                             roundedAverage = allSteps.reduce((prev, curr) => (Math.abs(curr - clampedAverage) < Math.abs(prev - clampedAverage) ? curr : prev));
+                             if (!allSteps.includes(roundedAverage)) { roundedAverage = allSteps.reduce((prev, curr) => Math.abs(curr - clampedAverage) < Math.abs(prev - clampedAverage) ? curr : prev); }
                              let letterGrade = '';
                              for (const band of gradeBands) {
                                  const rangeNums = band.ranges.map(r => parseFloat(r.replace('%', '')));
@@ -1513,8 +1560,8 @@
                                 ${roundedAverage}% (${letterGrade})</td>`;
                             
                             for (const outcome of learningOutcomes) {
-                                const grade = gradeBands.find(g => g.id === performanceLevels[outcome.id].bandId);
-                                tableHtml += `<td style="text-align: center; background-color: ${grade?.color || '#ccc'};">${performanceLevels[outcome.id].percentage}</td>`;
+                                const grade = gradeBands.find(g => g.id === performanceLevels[outcome.id]?.bandId); // Safe access
+                                tableHtml += `<td style="text-align: center; background-color: ${grade?.color || '#ccc'};">${performanceLevels[outcome.id]?.percentage || 'N/A'}</td>`; // Safe access
                             }
                             tableHtml += `</tr>`;
                             
@@ -1539,7 +1586,7 @@
                                 improvementList.innerHTML = '';
                                 
                                 learningOutcomes.forEach(outcome => {
-                                    const currentPercentage = parseFloat(performanceLevels[outcome.id].percentage);
+                                    const currentPercentage = parseFloat(performanceLevels[outcome.id]?.percentage); // Safe access
                                     const previousLevelInfo = mostRecentProfile.performanceLevels && mostRecentProfile.performanceLevels[outcome.id];
                                     const previousPercentage = previousLevelInfo ? parseFloat(previousLevelInfo.percentage) : NaN; 
                                     let changeText = 'N/A', changeClass = 'improvement-neutral';
@@ -1548,7 +1595,7 @@
                                          if (difference > 0) { changeText = `improved by ${difference.toFixed(0)}%`; changeClass = 'improvement-positive'; } 
                                          else if (difference < 0) { changeText = `decreased by ${Math.abs(difference).toFixed(0)}%`; changeClass = 'improvement-negative'; } 
                                          else { changeText = 'unchanged'; changeClass = 'improvement-neutral'; }
-                                     } else if (isNaN(previousPercentage)) { changeText = 'newly assessed'; changeClass = 'improvement-neutral'; }
+                                     } else if (isNaN(previousPercentage) && !isNaN(currentPercentage)) { changeText = 'newly assessed'; changeClass = 'improvement-neutral'; }
                                     const li = document.createElement('li');
                                     li.innerHTML = `<span style="font-weight: 600;">${outcome.title.split(':')[0]}:</span> <span class="${changeClass}">${changeText}</span>`;
                                     improvementList.appendChild(li);
@@ -1576,19 +1623,23 @@
                 }
             }
             
-            // Print assessment summary (remains the same, check content carefully)
+            // Print assessment summary - CORRECTED INVALID ESCAPE SEQUENCE
             function printSummary() {
                 const printWindow = window.open('', '_blank');
                 if (!printWindow) { alert('Please allow pop-ups to print the assessment summary.'); return; }
                 
                 // Calculate average grade (duplicate logic needed here too)
                  const percentages = Object.values(performanceLevels).map(level => parseFloat(level.percentage.replace('%', '')));
-                 const average = percentages.reduce((sum, val) => sum + val, 0) / percentages.length;
+                 const validPercentages = percentages.filter(p => !isNaN(p));
+                 if (validPercentages.length === 0) { /* Handle error or default state */ return; }
+                 const average = validPercentages.reduce((sum, val) => sum + val, 0) / validPercentages.length;
                  let roundedAverage;
                  const allSteps = gradeBands.flatMap(band => band.ranges.map(r => parseFloat(r.replace('%',''))));
                  allSteps.sort((a, b) => a - b);
-                 roundedAverage = allSteps.reduce((prev, curr) => (Math.abs(curr - average) < Math.abs(prev - average) ? curr : prev));
-                  if (!allSteps.includes(roundedAverage)) { roundedAverage = allSteps.reduce((prev, curr) => Math.abs(curr - average) < Math.abs(prev - average) ? curr : prev); }
+                 const minStep = allSteps[0], maxStep = allSteps[allSteps.length - 1];
+                 const clampedAverage = Math.max(minStep, Math.min(average, maxStep));
+                 roundedAverage = allSteps.reduce((prev, curr) => (Math.abs(curr - clampedAverage) < Math.abs(prev - clampedAverage) ? curr : prev));
+                 if (!allSteps.includes(roundedAverage)) { roundedAverage = allSteps.reduce((prev, curr) => Math.abs(curr - clampedAverage) < Math.abs(prev - clampedAverage) ? curr : prev); }
                  let gradeBandId = null, gradeBandTitle = '', letterGrade = '';
                  for (const band of gradeBands) {
                      const rangeNums = band.ranges.map(r => parseFloat(r.replace('%', '')));
@@ -1623,23 +1674,24 @@
                         <div class="date">Date: ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>
                         <div class="summary-box"><h3>Overall Assessment</h3><div class="average-grade">${roundedAverage}% (${letterGrade} - ${gradeBandTitle})</div></div>
                         <h3>Learning Outcomes Assessment</h3>
-                        ${learningOutcomes.map(outcome => {
+                        ${learningOutcomes.map(outcome => { // Start map
                             const gradeInfo = performanceLevels[outcome.id];
-                            const grade = gradeBands.find(g => g.id === gradeInfo.bandId);
-                            const feedback = outcome.feedback[gradeInfo.bandId]; 
+                            const grade = gradeBands.find(g => g.id === gradeInfo?.bandId); // Safe access
+                            const feedback = outcome.feedback[gradeInfo?.bandId]; // Safe access
+                            // *** CORRECTED: Removed invalid backslashes from return string ***
                             return \`<div class="outcome"><h4>${outcome.title}</h4>
                                 <div class="grade-band">Grade: ${grade?.title || 'N/A'} (${gradeInfo?.percentage || 'N/A'})</div>
                                 <p><strong>Strengths Evidenced in Your Work:</strong> ${feedback?.strength || 'N/A'}</p>
                                 <p><strong>Areas for Reflection and Practice:</strong> ${feedback?.evidence || 'N/A'}</p>
-                                <p><strong>Summary:</strong> ${feedback?.improvement || 'N/A'}</p></div>\`;
-                        }).join('')}
+                                <p><strong>Summary:</strong> ${feedback?.improvement || 'N/A'}</p></div>\`; // End return
+                        }).join('')} 
                         <h3>Key Areas for Overall Improvement</h3>
                         <ul>${overallImprovements[gradeBandId]?.map(advice => \`<li>${advice}</li>\`).join('') || '<li>N/A</li>'}</ul>
                         <div class="footer"><p>This assessment summary is for reference only and not an official grade.</p>
                         <p>Kingston School of Art - BA (Hons) Fashion Program – FN4004 Design Process 1</p>
                         <p>© ${new Date().getFullYear()} Kingston University</p></div>
                     </body></html>
-                `);
+                `); // End document.write
                 printWindow.document.close();
                  setTimeout(() => {
                      try { printWindow.focus(); printWindow.print(); } 
@@ -1647,7 +1699,8 @@
                  }, 750); 
             }
 
-        });
+
+        }); // End DOMContentLoaded
     </script>
    
 </body>
