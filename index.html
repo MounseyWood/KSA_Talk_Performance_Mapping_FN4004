@@ -1,0 +1,1221 @@
+import React, { useState, useEffect, useRef } from 'react';
+
+const FN4004MappingTool = () => {
+  // Define learning outcomes data for FN4004
+  const learningOutcomes = [
+    {
+      id: 'outcome1',
+      title: 'LO1: Research for Creative Design',
+      description: 'Use research sources as a basis for creative design by exploring, evaluating and originating ideas into contemporary fashion concepts.',
+      framework: 'Research and Analysis'
+    },
+    {
+      id: 'outcome2',
+      title: 'LO2: Design Development Process',
+      description: 'Creatively generate, collate and record information appropriate to the design development process.',
+      framework: 'Experimentation and Practice'
+    },
+    {
+      id: 'outcome3',
+      title: 'LO3: Material Understanding',
+      description: 'Demonstrate an understanding of material qualities and evaluate their application and appropriateness to design outcomes.',
+      framework: 'Experimentation and Practice'
+    },
+    {
+      id: 'outcome4',
+      title: 'LO4: Historical & Ethical Research',
+      description: 'Advance research into creative concepts that recognise historical and/or ethical and social considerations.',
+      framework: 'Research and Analysis'
+    },
+    {
+      id: 'outcome5',
+      title: 'LO5: Design Communication',
+      description: 'Communicate design outcomes using a variety of traditional and contemporary methods appropriate to professional contexts.',
+      framework: 'Communication and Presentation'
+    },
+    {
+      id: 'outcome6',
+      title: 'Personal & Professional Development',
+      description: 'Demonstrate effective planning, time-management, commitment & subject engagement, including the ability to work independently and collaboratively.',
+      framework: 'Personal and Professional Development'
+    }
+  ];
+
+  // Grade bands data with step marking (percentages ordered from high to low)
+  const gradeBands = [
+    { id: 'first-plus', title: 'First Class (A+)', ranges: ['100%', '98%', '95%', '92%', '88%', '85%'], quality: 'Outstanding', color: '#80FF80' },
+    { id: 'first', title: 'First Class (A)', ranges: ['82%', '78%', '75%', '72%', '70%'], quality: 'Very Good', color: '#BFFF80' },
+    { id: 'upper-second', title: 'Upper Second (B)', ranges: ['68%', '65%', '62%', '60%'], quality: 'Good', color: '#FFFF80' },
+    { id: 'lower-second', title: 'Lower Second (C)', ranges: ['58%', '55%', '52%', '50%'], quality: 'Satisfactory', color: '#FFE880' },
+    { id: 'third', title: 'Third Class (D)', ranges: ['48%', '45%', '42%', '40%'], quality: 'Adequate', color: '#FFCC80' },
+    { id: 'marginal-fail', title: 'Marginal Fail (FM)', ranges: ['38%', '35%'], quality: 'Unsatisfactory', color: '#FF9980' },
+    { id: 'fail', title: 'Fail (F)', ranges: ['32%', '28%', '25%', '22%', '0%'], quality: 'Poor', color: '#FF8080' }
+  ];
+
+  // Comprehensive feedback data from original HTML
+  const feedbackData = {
+    outcome1: {
+      'first-plus': {
+        strength: 'Your work shows outstanding and exceptional use of research sources that go far beyond requirements, showcasing unique insights and original thinking.',
+        evidence: 'You demonstrate comprehensive exploration of diverse and unexpected research sources, with sophisticated evaluation and critical analysis that informs your design development.',
+        improvement: 'Continue developing your exceptional research approach by exploring even more specialized or interdisciplinary sources that could further push fashion boundaries.'
+      },
+      'first': {
+        strength: 'Your work shows excellent use of research sources with deep understanding and creative application to design development.',
+        evidence: 'You demonstrate strong critical analysis of research, with creative and thoughtful translation into contemporary fashion concepts.',
+        improvement: 'To reach A+ level, push your research beyond the expected sources and demonstrate more innovative connections between research and design concepts.'
+      },
+      'upper-second': {
+        strength: 'Your work shows good ability to use research sources as a foundation for creative design work with solid evaluation skills.',
+        evidence: 'You provide clear evidence of research informing design decisions with thoughtful exploration of ideas and concepts.',
+        improvement: 'Deepen your critical analysis of research sources and show more creative connections between research and design development to move toward a First.'
+      },
+      'lower-second': {
+        strength: 'Your work shows satisfactory use of research sources with some evidence of evaluation and idea development.',
+        evidence: 'You demonstrate a basic research foundation with some connection to design development, though analysis could be more thorough.',
+        improvement: 'Focus on developing stronger analytical skills when evaluating research, and show clearer connections between research and design outcomes.'
+      },
+      'third': {
+        strength: 'Your work shows adequate use of research sources with basic understanding of how to apply them to design.',
+        evidence: 'You present some research but with limited depth and evaluation, mostly descriptive rather than analytical.',
+        improvement: 'Expand your research beyond obvious sources and develop your analytical skills to evaluate research more critically.'
+      },
+      'marginal-fail': {
+        strength: 'Your work shows limited understanding of how to use research sources for design development.',
+        evidence: 'You present minimal research with little or no evaluation, and weak connections to design concepts.',
+        improvement: 'Build a more structured approach to research, gathering more diverse sources and practice analyzing them in relation to your design ideas.'
+      },
+      'fail': {
+        strength: 'Your work shows very little evidence of research informing design work.',
+        evidence: 'There is insufficient research with no analysis or evaluation, disconnected from design development.',
+        improvement: 'Develop a basic understanding of research methods and how to apply research to inform design decisions and concepts.'
+      }
+    },
+    outcome2: {
+      'first-plus': {
+        strength: 'Your work shows exceptional confidence and creativity in generating, organizing, and documenting design development.',
+        evidence: 'You demonstrate outstanding progression of ideas with innovative approaches to recording design development and expert organization of information.',
+        improvement: 'Continue your excellent practice, perhaps exploring even more innovative methods of recording and presenting your design process.'
+      },
+      'first': {
+        strength: 'Your work shows excellent ability to confidently generate creative ideas and record them effectively throughout the design process.',
+        evidence: 'You present a very well-organized portfolio with creative and thorough documentation of the design development journey.',
+        improvement: 'To reach A+ level, experiment with more innovative or unexpected methods of recording your design process and organizing information.'
+      },
+      'upper-second': {
+        strength: 'Your work shows good confidence in generating and recording design ideas with clear progression.',
+        evidence: 'You provide well-documented design development with logical organization and progression of ideas.',
+        improvement: 'Work on developing more creative approaches to recording your design process and show more confidence in pursuing original ideas.'
+      },
+      'lower-second': {
+        strength: 'Your work shows satisfactory ability to generate and record design information with some creative elements.',
+        evidence: 'You provide adequate documentation of design development but lacks some clarity or creativity in organization.',
+        improvement: 'Improve the creativity and clarity in how you document your design process, showing more thoughtful organization and progression of ideas.'
+      },
+      'third': {
+        strength: 'Your work shows basic ability to generate and record design ideas.',
+        evidence: 'You present some documentation of design development but lacks organization and creative recording methods.',
+        improvement: 'Develop a more structured approach to organizing your portfolio and experiment with more creative ways to record your design process.'
+      },
+      'marginal-fail': {
+        strength: 'Your work shows limited ability to generate or record design information.',
+        evidence: 'You provide poor documentation with little evidence of design development or organization.',
+        improvement: 'Practice basic methods of recording design development and organizing information in a logical sequence.'
+      },
+      'fail': {
+        strength: 'Your work shows insufficient evidence of generating or recording design information.',
+        evidence: 'You present minimal or chaotic documentation with no clear design development process.',
+        improvement: 'Learn and apply fundamental principles of documenting design development and organizing information appropriately.'
+      }
+    },
+    outcome3: {
+      'first-plus': {
+        strength: 'Your work shows outstanding understanding of materials with exceptional ability to evaluate their qualities for innovative design applications.',
+        evidence: 'You demonstrate sophisticated material exploration with expert evaluation of properties and highly creative applications.',
+        improvement: 'Continue your exceptional material investigations, perhaps exploring even more sustainable or cutting-edge materials.'
+      },
+      'first': {
+        strength: 'Your work shows excellent understanding of material qualities with very good evaluation skills for design outcomes.',
+        evidence: 'You demonstrate strong material investigation with thoughtful analysis of properties and creative applications in design work.',
+        improvement: 'To reach A+ level, deepen your exploration of material innovation and consider more experimental applications in your designs.'
+      },
+      'upper-second': {
+        strength: 'Your work shows good understanding of material qualities with solid evaluation of their design applications.',
+        evidence: 'You provide clear evidence of material investigation with appropriate evaluation of properties for design outcomes.',
+        improvement: 'Develop a more sophisticated understanding of material properties and experiment with more creative or unexpected applications.'
+      },
+      'lower-second': {
+        strength: 'Your work shows satisfactory understanding of materials with some evaluation of their design applications.',
+        evidence: 'You present some material investigation but evaluation could be more thorough or creative.',
+        improvement: 'Enhance your material investigation with more in-depth analysis of properties and more thoughtful consideration of design applications.'
+      },
+      'third': {
+        strength: 'Your work shows basic understanding of materials with limited evaluation of their design applications.',
+        evidence: 'You present minimal material investigation with superficial evaluation of properties.',
+        improvement: 'Develop a more structured approach to investigating materials and practice evaluating their properties for specific design outcomes.'
+      },
+      'marginal-fail': {
+        strength: 'Your work shows limited understanding of materials with very little evaluation.',
+        evidence: 'You provide insufficient material investigation with poor consideration of properties or applications.',
+        improvement: 'Build basic knowledge of material properties and practice simple evaluation techniques for design applications.'
+      },
+      'fail': {
+        strength: 'Your work shows very little evidence of material understanding or evaluation.',
+        evidence: 'You present almost no material investigation or consideration of properties in relation to design.',
+        improvement: 'Learn fundamental principles of material properties and how they relate to design outcomes.'
+      }
+    },
+    outcome4: {
+      'first-plus': {
+        strength: 'Your work shows exceptional ability to research creative concepts with outstanding recognition of historical, ethical, and social contexts.',
+        evidence: 'You demonstrate sophisticated understanding of complex historical and ethical considerations with unique perspectives.',
+        improvement: 'Continue your excellent contextual research, perhaps exploring even more nuanced ethical or cultural considerations in fashion.'
+      },
+      'first': {
+        strength: 'Your work shows excellent research into creative concepts with strong historical, ethical, and social awareness.',
+        evidence: 'You demonstrate very good integration of historical and ethical considerations in research and design development.',
+        improvement: 'To reach A+ level, develop even deeper insights into historical contexts or ethical considerations that challenge conventional thinking.'
+      },
+      'upper-second': {
+        strength: 'Your work shows good research with clear recognition of historical and ethical considerations.',
+        evidence: 'You provide solid research into historical or ethical contexts with appropriate integration into design work.',
+        improvement: 'Deepen your exploration of historical and ethical contexts and show more sophisticated integration into your creative concepts.'
+      },
+      'lower-second': {
+        strength: 'Your work shows satisfactory research with some recognition of historical and ethical considerations.',
+        evidence: 'You present basic research into historical or ethical contexts but connections to design work could be stronger.',
+        improvement: 'Strengthen your research into historical and ethical contexts and make clearer connections to your design development.'
+      },
+      'third': {
+        strength: 'Your work shows basic research with limited recognition of historical or ethical considerations.',
+        evidence: 'You show some attempt to acknowledge historical or ethical contexts but lacks depth or relevance.',
+        improvement: 'Develop a more structured approach to researching historical and ethical contexts and practice applying these to your design work.'
+      },
+      'marginal-fail': {
+        strength: 'Your work shows limited research with minimal recognition of historical or ethical considerations.',
+        evidence: 'You present poor integration of historical or ethical contexts in research or design work.',
+        improvement: 'Build basic understanding of how historical and ethical considerations influence fashion design and practice incorporating these into your research.'
+      },
+      'fail': {
+        strength: 'Your work shows very little evidence of research into historical or ethical considerations.',
+        evidence: 'You present almost no acknowledgment of historical or ethical contexts in relation to design.',
+        improvement: 'Learn fundamental principles of historical and ethical research in fashion and begin to incorporate these into your design thinking.'
+      }
+    },
+    outcome5: {
+      'first-plus': {
+        strength: 'Your work shows outstanding communication of design outcomes using exceptionally skilled and innovative methods.',
+        evidence: 'You demonstrate mastery of both traditional and contemporary communication techniques with professional excellence.',
+        improvement: 'Continue exploring cutting-edge communication methods while maintaining your exceptional standard of presentation.'
+      },
+      'first': {
+        strength: 'Your work shows excellent communication of design outcomes using highly skilled traditional and contemporary methods.',
+        evidence: 'You present very professional work with creative and effective communication techniques throughout.',
+        improvement: 'To reach A+ level, experiment with more innovative or unexpected communication methods that push boundaries while maintaining clarity.'
+      },
+      'upper-second': {
+        strength: 'Your work shows good communication of design outcomes with skillful use of appropriate methods.',
+        evidence: 'You provide professional presentation with clear and effective communication of design ideas.',
+        improvement: 'Develop more creative and sophisticated communication techniques and ensure consistent professional quality throughout.'
+      },
+      'lower-second': {
+        strength: 'Your work shows satisfactory communication of design outcomes using appropriate methods.',
+        evidence: 'You present adequate work that communicates design ideas but lacks some refinement or creativity.',
+        improvement: 'Improve the consistency and creativity of your communication methods, paying more attention to professional presentation standards.'
+      },
+      'third': {
+        strength: 'Your work shows basic communication of design outcomes with limited method variety.',
+        evidence: 'You make some attempt at presenting design ideas but lacks professionalism or technique variety.',
+        improvement: 'Develop a wider range of communication techniques and practice applying them to present your ideas more professionally.'
+      },
+      'marginal-fail': {
+        strength: 'Your work shows limited ability to communicate design outcomes effectively.',
+        evidence: 'You present poor work with inadequate communication of design ideas.',
+        improvement: 'Learn and practice basic presentation techniques and focus on clearly communicating your design intentions.'
+      },
+      'fail': {
+        strength: 'Your work shows very little evidence of ability to communicate design outcomes.',
+        evidence: 'You present minimal or ineffective work with unclear communication of design ideas.',
+        improvement: 'Develop fundamental communication skills and learn standard methods for presenting fashion design work.'
+      }
+    },
+    outcome6: {
+      'first-plus': {
+        strength: 'Your work shows exceptional commitment and self-management with outstanding professional conduct.',
+        evidence: 'You demonstrate expert time management and organizational skills with proactive engagement and leadership qualities.',
+        improvement: 'Continue to develop your excellent professional approach by taking on leadership roles and mentoring others.'
+      },
+      'first': {
+        strength: 'Your work shows excellent commitment and self-management with very strong professional conduct.',
+        evidence: 'You demonstrate very good time management and organizational skills with consistent engagement throughout the project.',
+        improvement: 'To reach A+ level, develop your leadership skills and demonstrate more initiative in group contexts.'
+      },
+      'upper-second': {
+        strength: 'Your work shows good commitment and self-management with consistent professional conduct.',
+        evidence: 'You demonstrate good time management and organizational skills with active engagement in the project.',
+        improvement: 'Work on developing more consistent self-reflection and planning skills to enhance your professional approach.'
+      },
+      'lower-second': {
+        strength: 'Your work shows satisfactory commitment and self-management with adequate professional conduct.',
+        evidence: 'You demonstrate reasonable time management and organizational skills, though somewhat inconsistent.',
+        improvement: 'Improve your planning and self-management skills, and demonstrate more consistent engagement throughout projects.'
+      },
+      'third': {
+        strength: 'Your work shows basic commitment and self-management with developing professional conduct.',
+        evidence: 'You demonstrate limited time management and organizational skills with inconsistent engagement.',
+        improvement: 'Develop basic planning and organizational strategies, and practice applying them consistently to your work.'
+      },
+      'marginal-fail': {
+        strength: 'Your work shows limited commitment and poor self-management with minimal professional conduct.',
+        evidence: 'You demonstrate weak time management and organizational skills with little engagement.',
+        improvement: 'Learn fundamental time management and planning techniques and begin to apply them to your work processes.'
+      },
+      'fail': {
+        strength: 'Your work shows insufficient commitment and self-management with lack of professional conduct.',
+        evidence: 'You demonstrate very poor time management and organizational skills with minimal engagement.',
+        improvement: 'Develop basic understanding of professional conduct and time management for academic and design work.'
+      }
+    }
+  };
+
+  // Overall improvement advice by grade from original HTML
+  const overallImprovements = {
+    'fail': [
+      'Develop basic understanding of research methods and design processes',
+      'Begin to analyze materials rather than just describing them',
+      'Improve documentation of your design development process',
+      'Show evidence of basic material investigation',
+      'Practice fundamental presentation techniques',
+      'Develop basic time management and planning skills'
+    ],
+    'marginal-fail': [
+      'Strengthen your research with more diverse sources',
+      'Show clearer connections between research and design development',
+      'Improve organization and documentation of your design process',
+      'Conduct more thorough material investigations',
+      'Practice basic presentation techniques for more professional outcomes',
+      'Improve your self-management and planning'
+    ],
+    'third': [
+      'Expand your research beyond obvious sources',
+      'Develop better analytical skills rather than just describing',
+      'Improve organization of your design development process',
+      'Conduct more detailed material investigations with clearer evaluation',
+      'Show more consistent professionalism in presentation',
+      'Demonstrate more consistent engagement throughout projects'
+    ],
+    'lower-second': [
+      'Deepen your research and show stronger critical analysis',
+      'Make clearer connections between research and design development',
+      'Show more creative exploration in your design process',
+      'Enhance material investigations with more thoughtful evaluation',
+      'Improve consistency in professional presentation standards',
+      'Work on more effective planning and time management'
+    ],
+    'upper-second': [
+      'Extend research beyond expected sources with deeper critical analysis',
+      'Show more innovative connections between research and design',
+      'Demonstrate more creative exploration and risk-taking',
+      'Develop more sophisticated evaluation of materials and applications',
+      'Refine presentation techniques for more professional outcomes',
+      'Improve self-reflection and engagement with feedback'
+    ],
+    'first': [
+      'Push research to discover unexpected connections and insights',
+      'Take more creative risks that result in innovative outcomes',
+      'Demonstrate exceptional critical thinking throughout',
+      'Perfect technical execution in all aspects',
+      'Explore innovative presentation methods while maintaining clarity',
+      'Develop leadership skills and initiative in collaborative contexts'
+    ],
+    'first-plus': [
+      'Continue your outstanding work across all learning outcomes',
+      'Consider mentoring others to share your exceptional approach',
+      'Explore opportunities to showcase your work professionally',
+      'Maintain your excellent standard while continuing to innovate',
+      'Develop your professional network and industry connections'
+    ]
+  };
+
+  // State for current performance levels (grade band and specific percentage)
+  const [performanceLevels, setPerformanceLevels] = useState({
+    outcome1: { bandId: 'first', percentage: '75%' },
+    outcome2: { bandId: 'upper-second', percentage: '65%' },
+    outcome3: { bandId: 'lower-second', percentage: '55%' },
+    outcome4: { bandId: 'upper-second', percentage: '62%' },
+    outcome5: { bandId: 'first', percentage: '72%' },
+    outcome6: { bandId: 'upper-second', percentage: '68%' }
+  });
+
+  // State for modals
+  const [showMatrixModal, setShowMatrixModal] = useState(false);
+  const [showCompareModal, setShowCompareModal] = useState(false);
+  const [showSaveSuccessMessage, setShowSaveSuccessMessage] = useState(false);
+  const [savedProfiles, setSavedProfiles] = useState([]);
+  
+  // Canvas for radar chart
+  const canvasRef = useRef(null);
+
+  // Draw radar chart
+  useEffect(() => {
+    if (!canvasRef.current) return;
+
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d');
+    
+    // Clear canvas
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    const centerX = canvas.width / 2;
+    const centerY = canvas.height / 2;
+    const radius = Math.min(centerX, centerY) - 30;
+    
+    // Draw axes
+    const numAxes = learningOutcomes.length;
+    const angleStep = (Math.PI * 2) / numAxes;
+    
+    // Draw concentric circles for grade levels
+    const gradeLevels = gradeBands.length;
+    const radiusStep = radius / gradeLevels;
+    
+    // Draw grade level circles
+    for (let i = 1; i <= gradeLevels; i++) {
+      const levelRadius = radiusStep * i;
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, levelRadius, 0, Math.PI * 2);
+      ctx.strokeStyle = i === gradeLevels ? '#333' : '#ddd';
+      ctx.stroke();
+      
+      // Label the grade level
+      if (i < gradeLevels) {
+        const grade = gradeBands[gradeLevels - i - 1];
+        ctx.fillStyle = '#666';
+        ctx.font = '10px Arial';
+        ctx.fillText(grade.title.split(' ')[0], centerX + 5, centerY - levelRadius - 5);
+      }
+    }
+    
+    // Draw axes
+    for (let i = 0; i < numAxes; i++) {
+      const angle = i * angleStep - Math.PI / 2;
+      const x = centerX + radius * Math.cos(angle);
+      const y = centerY + radius * Math.sin(angle);
+      
+      ctx.beginPath();
+      ctx.moveTo(centerX, centerY);
+      ctx.lineTo(x, y);
+      ctx.strokeStyle = '#aaa';
+      ctx.stroke();
+      
+      // Label the axis
+      const labelX = centerX + (radius + 20) * Math.cos(angle);
+      const labelY = centerY + (radius + 20) * Math.sin(angle);
+      
+      ctx.fillStyle = '#333';
+      ctx.font = '12px Arial';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      
+      // Adjust label position for better readability
+      const outcome = learningOutcomes[i].title.split(':')[0];
+      ctx.fillText(outcome, labelX, labelY);
+    }
+    
+    // Plot data points
+    const dataPoints = [];
+    
+    for (let i = 0; i < numAxes; i++) {
+      const outcome = learningOutcomes[i];
+      const gradeId = performanceLevels[outcome.id].bandId;
+      const gradeIndex = gradeBands.findIndex(g => g.id === gradeId);
+      
+      // Reverse the index since highest grades are on the outside
+      const reversedIndex = gradeBands.length - gradeIndex - 1;
+      
+      const pointRadius = radiusStep * (reversedIndex + 0.5);
+      const angle = i * angleStep - Math.PI / 2;
+      const x = centerX + pointRadius * Math.cos(angle);
+      const y = centerY + pointRadius * Math.sin(angle);
+      
+      dataPoints.push({ x, y });
+    }
+    
+    // Draw the shape
+    ctx.beginPath();
+    ctx.moveTo(dataPoints[0].x, dataPoints[0].y);
+    
+    for (let i = 1; i < dataPoints.length; i++) {
+      ctx.lineTo(dataPoints[i].x, dataPoints[i].y);
+    }
+    
+    ctx.lineTo(dataPoints[0].x, dataPoints[0].y);
+    ctx.fillStyle = 'rgba(59, 130, 246, 0.3)';
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(59, 130, 246, 0.8)';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    
+    // Draw data points
+    dataPoints.forEach((point, index) => {
+      const outcome = learningOutcomes[index];
+      const gradeId = performanceLevels[outcome.id].bandId;
+      const grade = gradeBands.find(g => g.id === gradeId);
+      
+      ctx.beginPath();
+      ctx.arc(point.x, point.y, 6, 0, Math.PI * 2);
+      ctx.fillStyle = grade.color;
+      ctx.fill();
+      ctx.strokeStyle = '#333';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+    });
+    
+  }, [performanceLevels]);
+
+  // Handle grade band change for a learning outcome
+  const handleGradeBandChange = (outcomeId, gradeId) => {
+    // Default to the first percentage in the selected grade band
+    const defaultPercentage = gradeBands.find(g => g.id === gradeId).ranges[0];
+    
+    setPerformanceLevels({
+      ...performanceLevels,
+      [outcomeId]: { 
+        bandId: gradeId, 
+        percentage: defaultPercentage 
+      }
+    });
+  };
+
+  // Handle specific percentage change
+  const handlePercentageChange = (outcomeId, percentage) => {
+    // Find which grade band this percentage belongs to
+    let gradeBandId = null;
+    
+    for (const band of gradeBands) {
+      if (band.ranges.includes(percentage)) {
+        gradeBandId = band.id;
+        break;
+      }
+    }
+    
+    if (gradeBandId) {
+      setPerformanceLevels({
+        ...performanceLevels,
+        [outcomeId]: {
+          bandId: gradeBandId,
+          percentage: percentage
+        }
+      });
+    }
+  };
+
+  // Calculate average grade (for display purposes only)
+  const calculateAverageGrade = (levels = performanceLevels) => {
+    // Convert percentage strings to numbers
+    const percentages = Object.values(levels).map(level => 
+      parseFloat(level.percentage.replace('%', ''))
+    );
+    
+    // Calculate simple average
+    const average = percentages.reduce((sum, val) => sum + val, 0) / percentages.length;
+    
+    // Find which grade band this average falls into
+    for (const band of gradeBands) {
+      const rangeNums = band.ranges.map(r => parseFloat(r.replace('%', '')));
+      const minRange = Math.min(...rangeNums);
+      const maxRange = Math.max(...rangeNums);
+      
+      if (average >= minRange && average <= maxRange) {
+        // Round to nearest step mark
+        let roundedAverage;
+        if (average % 10 <= 2) roundedAverage = Math.floor(average / 10) * 10 + 2;
+        else if (average % 10 <= 5) roundedAverage = Math.floor(average / 10) * 10 + 5;
+        else if (average % 10 <= 8) roundedAverage = Math.floor(average / 10) * 10 + 8;
+        else roundedAverage = Math.ceil(average / 10) * 10;
+        
+        return {
+          bandId: band.id,
+          bandTitle: band.title,
+          numericValue: roundedAverage,
+          letterGrade: band.id === 'first-plus' ? 'A+' : 
+                      band.id === 'first' ? 'A' :
+                      band.id === 'upper-second' ? 'B' :
+                      band.id === 'lower-second' ? 'C' :
+                      band.id === 'third' ? 'D' :
+                      band.id === 'marginal-fail' ? 'FM' : 'F'
+        };
+      }
+    }
+
+    return { bandId: 'unknown', bandTitle: 'Unknown', numericValue: Math.round(average), letterGrade: '?' };
+  };
+  
+  // Save current assessment profile
+  const saveAssessmentProfile = () => {
+    // Get current date for profile identification
+    const now = new Date();
+    const dateString = now.toISOString().slice(0, 10);
+    const timeString = now.toTimeString().slice(0, 5);
+    
+    // Create profile object
+    const profile = {
+      id: `profile-${Date.now()}`,
+      date: `${dateString} ${timeString}`,
+      performanceLevels: {...performanceLevels},
+      averageGrade: calculateAverageGrade()
+    };
+    
+    // Retrieve existing profiles from localStorage
+    let existingProfiles = [];
+    try {
+      const storedProfiles = localStorage.getItem('fn4004-assessment-profiles');
+      if (storedProfiles) {
+        existingProfiles = JSON.parse(storedProfiles);
+      }
+    } catch (error) {
+      console.error('Error loading saved profiles:', error);
+    }
+    
+    // Add new profile and save back to localStorage
+    const updatedProfiles = [profile, ...existingProfiles].slice(0, 10); // Keep only 10 most recent
+    localStorage.setItem('fn4004-assessment-profiles', JSON.stringify(updatedProfiles));
+    
+    // Update state
+    setSavedProfiles(updatedProfiles);
+    setShowSaveSuccessMessage(true);
+    
+    // Hide success message after 3 seconds
+    setTimeout(() => {
+      setShowSaveSuccessMessage(false);
+    }, 3000);
+  };
+  
+  // Load saved profiles from localStorage
+  useEffect(() => {
+    try {
+      const storedProfiles = localStorage.getItem('fn4004-assessment-profiles');
+      if (storedProfiles) {
+        setSavedProfiles(JSON.parse(storedProfiles));
+      }
+    } catch (error) {
+      console.error('Error loading saved profiles:', error);
+    }
+  }, []);
+  
+  // Print assessment summary
+  const printAssessmentSummary = () => {
+    const printWindow = window.open('', '_blank');
+    
+    if (!printWindow) {
+      alert('Please allow pop-ups to print the assessment summary.');
+      return;
+    }
+    
+    const averageGrade = calculateAverageGrade();
+    
+    // Create print content
+    printWindow.document.write(`
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>FN4004 Assessment Summary</title>
+        <style>
+          body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+          }
+          .header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #ccc;
+          }
+          .summary-box {
+            border: 1px solid #ccc;
+            padding: 15px;
+            margin-bottom: 20px;
+            background-color: #f9f9f9;
+          }
+          .outcome {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px dashed #eee;
+          }
+          .grade-band {
+            font-weight: bold;
+            margin-bottom: 5px;
+          }
+          .average-grade {
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
+            margin: 20px 0;
+          }
+          .date {
+            text-align: right;
+            font-style: italic;
+            margin-bottom: 20px;
+          }
+          .footer {
+            margin-top: 30px;
+            font-size: 12px;
+            text-align: center;
+            color: #666;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="header">
+          <h1>FN4004 Design Process 1</h1>
+          <h2>Assessment Profile Summary</h2>
+        </div>
+        
+        <div class="date">Date: ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>
+        
+        <div class="summary-box">
+          <h3>Overall Assessment</h3>
+          <div class="average-grade">
+            ${averageGrade.numericValue}% (${averageGrade.letterGrade} - ${averageGrade.bandTitle})
+          </div>
+        </div>
+        
+        <h3>Learning Outcomes Assessment</h3>
+        
+        ${learningOutcomes.map(outcome => {
+          const gradeInfo = performanceLevels[outcome.id];
+          const grade = gradeBands.find(g => g.id === gradeInfo.bandId);
+          const feedback = feedbackData[outcome.id][gradeInfo.bandId];
+          
+          return `
+            <div class="outcome">
+              <h4>${outcome.title}</h4>
+              <p>${outcome.description}</p>
+              <div class="grade-band">Grade: ${grade.title} (${gradeInfo.percentage})</div>
+              <p><strong>Strengths:</strong> ${feedback.strength}</p>
+              <p><strong>Evidence:</strong> ${feedback.evidence}</p>
+              <p><strong>For improvement:</strong> ${feedback.improvement}</p>
+            </div>
+          `;
+        }).join('')}
+        
+        <h3>Key Areas for Improvement</h3>
+        <ul>
+          ${overallImprovements[averageGrade.bandId]?.map(advice => 
+            `<li>${advice}</li>`
+          ).join('')}
+        </ul>
+        
+        <div class="footer">
+          <p>This assessment summary is for reference only and not an official grade.</p>
+          <p>Kingston School of Art - BA (Hons) Fashion Program – FN4004 Design Process 1</p>
+          <p>© ${new Date().getFullYear()} Kingston University</p>
+        </div>
+      </body>
+      </html>
+    `);
+    
+    printWindow.document.close();
+    
+    // Wait for content to load then print
+    setTimeout(() => {
+      printWindow.print();
+    }, 500);
+  };
+
+  const averageGrade = calculateAverageGrade();
+
+  return (
+    <div className="max-w-6xl mx-auto p-6 bg-white">
+      <div className="text-center mb-8">
+        <img src="Talk_Performance_Mapping_FN4004.png" alt="FN4004 Performance Mapping Tool" className="mx-auto mb-4 max-h-64" />
+        <p className="text-gray-600 max-w-3xl mx-auto">
+          This interactive tool helps you understand how your performance varies across different learning outcomes.
+          Select your current level for each learning outcome to see targeted feedback and visualize your overall profile.
+        </p>
+      </div>
+      
+      <div className="grid md:grid-cols-2 gap-8">
+        {/* Left column - Inputs */}
+        <div className="bg-gray-50 p-6 rounded-md">
+          <h2 className="text-xl font-bold mb-4">Your Performance Level by Outcome</h2>
+          
+          {learningOutcomes.map(outcome => (
+            <div key={outcome.id} className="mb-6">
+              <h3 className="font-bold text-gray-800">{outcome.title}</h3>
+              <p className="text-sm text-gray-600 mb-2">{outcome.description}</p>
+              <p className="text-xs text-blue-600 mb-3">Framework: {outcome.framework}</p>
+              
+              <div className="mb-3">
+                <label className="text-sm font-semibold block mb-1">Select Grade Band:</label>
+                <div className="flex flex-wrap gap-2">
+                  {gradeBands.map(grade => (
+                    <button
+                      key={grade.id}
+                      onClick={() => handleGradeBandChange(outcome.id, grade.id)}
+                      className={`px-3 py-1 text-xs rounded-sm transition-colors ${
+                        performanceLevels[outcome.id].bandId === grade.id 
+                          ? 'ring-2 ring-gray-800 font-bold' 
+                          : 'opacity-70'
+                      }`}
+                      style={{ 
+                        backgroundColor: performanceLevels[outcome.id].bandId === grade.id ? '#FFF200' : grade.color, 
+                        color: '#000' 
+                      }}
+                    >
+                      {grade.title}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              
+              <div>
+                <label className="text-sm font-semibold block mb-1">Select Specific Mark:</label>
+                <div className="flex flex-wrap gap-2">
+                  {gradeBands
+                    .find(g => g.id === performanceLevels[outcome.id].bandId)
+                    ?.ranges.map(percentage => (
+                    <button
+                      key={percentage}
+                      onClick={() => handlePercentageChange(outcome.id, percentage)}
+                      className={`px-3 py-1 text-xs border rounded-sm ${
+                        performanceLevels[outcome.id].percentage === percentage 
+                          ? 'bg-[#FFF200] font-bold border-gray-800' 
+                          : 'bg-white border-gray-300'
+                      }`}
+                    >
+                      {percentage}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+        
+        {/* Right column - Results */}
+        <div>
+          {/* Radar chart */}
+          <div className="bg-white p-4 rounded-md shadow-md mb-6">
+            <h2 className="text-xl font-bold mb-4 text-center">Your Performance Profile</h2>
+            <canvas 
+              ref={canvasRef} 
+              width={400} 
+              height={400} 
+              className="mx-auto"
+            ></canvas>
+          </div>
+          
+          {/* Indicative average grade (for information only) */}
+          <div className="bg-white p-4 rounded-md shadow-md mb-6">
+            <h2 className="text-xl font-bold mb-2 text-center">Indicative Average Grade</h2>
+            <p className="text-sm text-gray-500 mb-3 text-center">Note: This is for reference only and not an official grade calculation.</p>
+            <div className="flex items-center justify-center gap-4 p-4 rounded-md" 
+                style={{ backgroundColor: gradeBands.find(g => g.id === averageGrade.bandId)?.color || '#ccc' }}>
+              <div className="text-center">
+                <div className="text-4xl font-bold">{averageGrade.letterGrade}</div>
+                <div className="text-sm">{averageGrade.bandTitle}</div>
+              </div>
+              <div className="text-5xl font-bold">{averageGrade.numericValue}%</div>
+            </div>
+          </div>
+          
+          {/* Key areas for improvement */}
+          <div className="bg-white p-4 rounded-md shadow-md">
+            <h2 className="text-xl font-bold mb-4">Key Areas for Improvement</h2>
+            <ul className="list-disc pl-5 space-y-2">
+              {learningOutcomes.map(outcome => {
+                const feedback = feedbackData[outcome.id][performanceLevels[outcome.id].bandId];
+                
+                if (!feedback) return null;
+                
+                return (
+                  <li key={outcome.id}>
+                    <span className="font-semibold">{outcome.title.split(':')[0]}:</span> {feedback.improvement}
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        </div>
+      </div>
+      
+      {/* Bottom section - Detailed feedback */}
+      <div className="mt-8 bg-gray-50 p-6 rounded-md">
+        <h2 className="text-xl font-bold mb-4">Your Detailed Assessment Profile</h2>
+        
+        <div className="grid md:grid-cols-2 gap-6">
+          {learningOutcomes.map(outcome => {
+            const gradeInfo = performanceLevels[outcome.id];
+            const grade = gradeBands.find(g => g.id === gradeInfo.bandId);
+            const feedback = feedbackData[outcome.id][gradeInfo.bandId];
+            
+            return (
+              <div key={outcome.id} className="bg-white p-4 rounded-md shadow-sm">
+                <div className="flex justify-between items-start mb-3">
+                  <h3 className="font-bold">{outcome.title}</h3>
+                  <div className="flex flex-col items-end">
+                    <span 
+                      className="px-2 py-1 rounded-md text-sm font-bold mb-1"
+                      style={{ backgroundColor: grade.color }}
+                    >
+                      {grade.title}
+                    </span>
+                    <span className="text-sm font-bold">{gradeInfo.percentage}</span>
+                  </div>
+                </div>
+                
+                <div className="text-sm">
+                  <div className="mb-2">
+                    <strong>Strengths:</strong> {feedback.strength}
+                  </div>
+                  <div className="mb-2">
+                    <strong>Evidence:</strong> {feedback.evidence}
+                  </div>
+                  <div>
+                    <strong>For improvement:</strong> {feedback.improvement}
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+      
+      {/* Overall Advice section */}
+      <div className="mt-8 bg-white p-6 rounded-md shadow-md">
+        <h2 className="text-xl font-bold mb-4">How to improve your overall grade:</h2>
+        <ul className="list-disc pl-5 space-y-2">
+          {overallImprovements[averageGrade.bandId]?.map((advice, index) => (
+            <li key={index}>{advice}</li>
+          ))}
+        </ul>
+      </div>
+      
+      {/* All action buttons in one group */}
+      <div className="mt-8 flex flex-wrap justify-center gap-4">
+        <button 
+          className="bg-[#FFF200] text-black font-bold py-3 px-6 rounded-sm hover:bg-opacity-90 transition-colors"
+          onClick={saveAssessmentProfile}
+        >
+          Save My Assessment Profile
+        </button>
+        <button 
+          className="bg-[#FFF200] text-black font-bold py-3 px-6 rounded-sm hover:bg-opacity-90 transition-colors"
+          onClick={() => setShowCompareModal(true)}
+          disabled={savedProfiles.length === 0}
+          style={{opacity: savedProfiles.length === 0 ? 0.5 : 1}}
+        >
+          Compare with Previous Assessments
+        </button>
+        <button 
+          className="bg-[#FFF200] text-black font-bold py-3 px-6 rounded-sm hover:bg-opacity-90 transition-colors"
+          onClick={printAssessmentSummary}
+        >
+          Print Assessment Summary
+        </button>
+        <button 
+          className="bg-[#FFF200] text-black font-bold py-3 px-6 rounded-sm hover:bg-opacity-90 transition-colors"
+          onClick={() => setShowMatrixModal(true)}
+        >
+          Complete FN4004 Grade Descriptor Matrix
+        </button>
+        <a 
+          href="https://canvas.kingston.ac.uk/courses/8255/pages/7-fairness-in-assessment" 
+          className="bg-[#FFF200] text-black font-bold py-3 px-6 rounded-sm hover:bg-opacity-90 transition-colors"
+          target="_blank"
+        >
+          Fairness in Assessment
+        </a>
+        <a 
+          href="https://kingstonuniversity.sharepoint.com/sites/mykingston/mysupport/myskills/Pages/default.aspx" 
+          className="bg-[#FFF200] text-black font-bold py-3 px-6 rounded-sm hover:bg-opacity-90 transition-colors"
+          target="_blank"
+        >
+          Support for Building Academic Skills
+        </a>
+        <a 
+          href="https://canvas.kingston.ac.uk/courses/32501" 
+          className="bg-[#FFF200] text-black font-bold py-3 px-6 rounded-sm hover:bg-opacity-90 transition-colors"
+          target="_blank"
+        >
+          Back to Module Home Page
+        </a>
+      </div>
+      
+      {/* Save success message */}
+      {showSaveSuccessMessage && (
+        <div className="fixed top-4 right-4 bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded shadow-md">
+          <div className="flex items-center">
+            <div className="py-1">
+              <svg className="h-6 w-6 text-green-500 mr-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+            <div>
+              <p className="font-bold">Assessment Profile Saved!</p>
+              <p className="text-sm">You can now compare with previous assessments.</p>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      <div className="mt-8 text-sm text-gray-500 bg-gray-100 p-4 rounded-md border-l-4 border-[#FFF200]">
+        <p>Note: This is a visual interpretation of the Kingston School of Art BA (Hons) Fashion grade descriptors for FN4004. Always refer to the official grade descriptors in your course handbook for definitive guidance.</p>
+      </div>
+      
+      <div className="mt-12 text-center border-t border-gray-200 pt-6 text-gray-600 text-sm">
+        <p>Kingston School of Art - BA (Hons) Fashion Program – Learning Outcomes, Feedback and Assessment Knowledge Base</p>
+        <p>© 2025 Kingston University</p>
+      </div>
+      
+      {/* Grade Descriptor Matrix Modal */}
+      {showMatrixModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 p-4 overflow-y-auto">
+          <div className="bg-white p-6 rounded-md max-w-4xl max-h-[90vh] overflow-auto">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold">Complete FN4004 Grade Descriptor Matrix</h2>
+              <button 
+                onClick={() => setShowMatrixModal(false)}
+                className="text-gray-600 hover:text-gray-900 text-2xl font-medium"
+              >
+                &times;
+              </button>
+            </div>
+            
+            <div className="mb-4">
+              <p>The following matrix maps the FN4004 Learning Outcomes against grade descriptors, showing what is expected at each level of achievement.</p>
+            </div>
+            
+            <div className="overflow-x-auto">
+              <table className="min-w-full border-collapse">
+                <thead>
+                  <tr>
+                    <th className="border p-2 bg-gray-100">Learning Outcomes</th>
+                    <th className="border p-2" style={{backgroundColor: '#80FF80'}}>First Class (A+)<br/>85-100%</th>
+                    <th className="border p-2" style={{backgroundColor: '#BFFF80'}}>First Class (A)<br/>70-84%</th>
+                    <th className="border p-2" style={{backgroundColor: '#FFFF80'}}>Upper Second (B)<br/>60-69%</th>
+                    <th className="border p-2" style={{backgroundColor: '#FFE880'}}>Lower Second (C)<br/>50-59%</th>
+                    <th className="border p-2" style={{backgroundColor: '#FFCC80'}}>Third Class (D)<br/>40-49%</th>
+                    <th className="border p-2" style={{backgroundColor: '#FF9980'}}>Marginal Fail (FM)<br/>35-39%</th>
+                    <th className="border p-2" style={{backgroundColor: '#FF8080'}}>Fail (F)<br/>0-34%</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th className="border p-2 text-left bg-gray-100">LO1: Research for Creative Design</th>
+                    <td className="border p-2 text-sm">Outstanding and exceptional use of research sources that go far beyond requirements; highly original thinking.</td>
+                    <td className="border p-2 text-sm">Excellent use of research sources showing deep understanding and creative application to design development.</td>
+                    <td className="border p-2 text-sm">Good ability to use research sources with solid evaluation and critical thinking skills.</td>
+                    <td className="border p-2 text-sm">Satisfactory use of research sources with some evidence of evaluation.</td>
+                    <td className="border p-2 text-sm">Basic understanding of research sources with limited application to design.</td>
+                    <td className="border p-2 text-sm">Limited understanding of how to use research sources for design development.</td>
+                    <td className="border p-2 text-sm">Very little evidence of research informing design work.</td>
+                  </tr>
+                  <tr>
+                    <th className="border p-2 text-left bg-gray-100">LO2: Design Development Process</th>
+                    <td className="border p-2 text-sm">Exceptional creativity and innovation in generating and documenting design development with expert organization.</td>
+                    <td className="border p-2 text-sm">Excellent ability to confidently generate creative ideas and record them effectively through the design process.</td>
+                    <td className="border p-2 text-sm">Good confidence in generating and recording design ideas with clear progression.</td>
+                    <td className="border p-2 text-sm">Satisfactory ability to generate and record design information with some creative elements.</td>
+                    <td className="border p-2 text-sm">Basic ability to generate and record design ideas with minimal organization.</td>
+                    <td className="border p-2 text-sm">Limited ability to generate or record design information effectively.</td>
+                    <td className="border p-2 text-sm">Insufficient evidence of generating or recording design information.</td>
+                  </tr>
+                  <tr>
+                    <th className="border p-2 text-left bg-gray-100">LO3: Material Understanding</th>
+                    <td className="border p-2 text-sm">Outstanding understanding of materials with exceptional evaluation skills for innovative applications.</td>
+                    <td className="border p-2 text-sm">Excellent understanding of material qualities with very good evaluation skills for design outcomes.</td>
+                    <td className="border p-2 text-sm">Good understanding of material qualities with solid evaluation of their design applications.</td>
+                    <td className="border p-2 text-sm">Satisfactory understanding of materials with some evaluation of their design applications.</td>
+                    <td className="border p-2 text-sm">Basic understanding of materials with limited evaluation of their design applications.</td>
+                    <td className="border p-2 text-sm">Limited understanding of materials with very little evaluation.</td>
+                    <td className="border p-2 text-sm">Very little evidence of material understanding or evaluation.</td>
+                  </tr>
+                  <tr>
+                    <th className="border p-2 text-left bg-gray-100">LO4: Historical & Ethical Research</th>
+                    <td className="border p-2 text-sm">Exceptional ability to research creative concepts with outstanding recognition of complex historical, ethical, and social contexts.</td>
+                    <td className="border p-2 text-sm">Excellent research into creative concepts with strong historical, ethical, and social awareness.</td>
+                    <td className="border p-2 text-sm">Good research with clear recognition of historical and ethical considerations.</td>
+                    <td className="border p-2 text-sm">Satisfactory research with some recognition of historical and ethical considerations.</td>
+                    <td className="border p-2 text-sm">Basic research with limited recognition of historical or ethical considerations.</td>
+                    <td className="border p-2 text-sm">Limited research with minimal recognition of historical or ethical considerations.</td>
+                    <td className="border p-2 text-sm">Very little evidence of research into historical or ethical considerations.</td>
+                  </tr>
+                  <tr>
+                    <th className="border p-2 text-left bg-gray-100">LO5: Design Communication</th>
+                    <td className="border p-2 text-sm">Outstanding communication of design outcomes using exceptionally skilled and innovative methods suitable for professional contexts.</td>
+                    <td className="border p-2 text-sm">Excellent communication of design outcomes using highly skilled traditional and contemporary methods.</td>
+                    <td className="border p-2 text-sm">Good communication of design outcomes with skillful use of appropriate methods.</td>
+                    <td className="border p-2 text-sm">Satisfactory communication of design outcomes using appropriate methods.</td>
+                    <td className="border p-2 text-sm">Basic communication of design outcomes with limited method variety.</td>
+                    <td className="border p-2 text-sm">Limited ability to communicate design outcomes effectively.</td>
+                    <td className="border p-2 text-sm">Very little evidence of ability to communicate design outcomes.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            
+            <div className="text-center mt-6">
+              <button 
+                className="bg-[#FFF200] text-black font-bold py-3 px-6 rounded-sm hover:bg-opacity-90 transition-colors"
+                onClick={() => setShowMatrixModal(false)}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {/* Compare Previous Assessments Modal */}
+      {showCompareModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 p-4 overflow-y-auto">
+          <div className="bg-white p-6 rounded-md max-w-4xl max-h-[90vh] overflow-auto">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold">Compare with Previous Assessments</h2>
+              <button 
+                onClick={() => setShowCompareModal(false)}
+                className="text-gray-600 hover:text-gray-900 text-2xl font-medium"
+              >
+                &times;
+              </button>
+            </div>
+            
+            {savedProfiles.length === 0 ? (
+              <div className="text-center p-8 text-gray-500">
+                <p>No saved assessment profiles found.</p>
+                <p className="mt-2 text-sm">Save your current assessment to enable comparison.</p>
+              </div>
+            ) : (
+              <div>
+                <div className="mb-6">
+                  <h3 className="font-bold mb-2">Progress Over Time</h3>
+                  <div className="bg-gray-50 p-4 rounded-md">
+                    <table className="w-full border-collapse">
+                      <thead>
+                        <tr>
+                          <th className="border p-2 bg-gray-100">Date</th>
+                          <th className="border p-2 bg-gray-100">Average Grade</th>
+                          {learningOutcomes.map(outcome => (
+                            <th key={outcome.id} className="border p-2 bg-gray-100">{outcome.title.split(':')[0]}</th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {/* Current assessment (not yet saved) */}
+                        <tr>
+                          <td className="border p-2 font-bold">Current</td>
+                          <td className="border p-2 font-bold text-center">
+                            {calculateAverageGrade().numericValue}% ({calculateAverageGrade().letterGrade})
+                          </td>
+                          {learningOutcomes.map(outcome => (
+                            <td key={outcome.id} className="border p-2 text-center" 
+                                style={{backgroundColor: gradeBands.find(g => g.id === performanceLevels[outcome.id].bandId)?.color}}>
+                              {performanceLevels[outcome.id].percentage}
+                            </td>
+                          ))}
+                        </tr>
+                        
+                        {/* Previous saved assessments */}
+                        {savedProfiles.map(profile => (
+                          <tr key={profile.id}>
+                            <td className="border p-2">{profile.date}</td>
+                            <td className="border p-2 text-center">
+                              {profile.averageGrade.numericValue}% ({profile.averageGrade.letterGrade})
+                            </td>
+                            {learningOutcomes.map(outcome => (
+                              <td key={outcome.id} className="border p-2 text-center"
+                                  style={{backgroundColor: gradeBands.find(g => g.id === profile.performanceLevels[outcome.id].bandId)?.color}}>
+                                {profile.performanceLevels[outcome.id].percentage}
+                              </td>
+                            ))}
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+                
+                <div className="mb-6">
+                  <h3 className="font-bold mb-2">Improvement Analysis</h3>
+                  {savedProfiles.length > 0 && (
+                    <div className="bg-white p-4 rounded-md border border-gray-200">
+                      <h4 className="font-semibold mb-2">Compared to previous assessment ({savedProfiles[0].date}):</h4>
+                      <ul className="list-disc pl-5 space-y-1">
+                        {learningOutcomes.map(outcome => {
+                          const currentPercentage = parseFloat(performanceLevels[outcome.id].percentage);
+                          const previousPercentage = parseFloat(savedProfiles[0].performanceLevels[outcome.id].percentage);
+                          const difference = currentPercentage - previousPercentage;
+                          
+                          let changeText = '';
+                          let changeColor = '';
+                          
+                          if (difference > 0) {
+                            changeText = `improved by ${difference.toFixed(1)}%`;
+                            changeColor = 'text-green-600';
+                          } else if (difference < 0) {
+                            changeText = `decreased by ${Math.abs(difference).toFixed(1)}%`;
+                            changeColor = 'text-red-600';
+                          } else {
+                            changeText = 'unchanged';
+                            changeColor = 'text-gray-600';
+                          }
+                          
+                          return (
+                            <li key={outcome.id}>
+                              <span className="font-medium">{outcome.title.split(':')[0]}:</span> <span className={changeColor}>{changeText}</span>
+                            </li>
+                          );
+                        })}
+                        
+                        {/* Overall change */}
+                        {(() => {
+                          const currentAvg = calculateAverageGrade().numericValue;
+                          const previousAvg = savedProfiles[0].averageGrade.numericValue;
+                          const difference = currentAvg - previousAvg;
+                          
+                          let changeText = '';
+                          let changeColor = '';
+                          
+                          if (difference > 0) {
+                            changeText = `improved by ${difference.toFixed(1)}%`;
+                            changeColor = 'text-green-600';
+                          } else if (difference < 0) {
+                            changeText = `decreased by ${Math.abs(difference).toFixed(1)}%`;
+                            changeColor = 'text-red-600';
+                          } else {
+                            changeText = 'unchanged';
+                            changeColor = 'text-gray-600';
+                          }
+                          
+                          return (
+                            <li className="mt-2 font-semibold">
+                              <span>Overall grade:</span> <span className={changeColor}>{changeText}</span>
+                            </li>
+                          );
+                        })()}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+            
+            <div className="text-center mt-6">
+              <button 
+                className="bg-[#FFF200] text-black font-bold py-3 px-6 rounded-sm hover:bg-opacity-90 transition-colors"
+                onClick={() => setShowCompareModal(false)}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default FN4004MappingTool;
